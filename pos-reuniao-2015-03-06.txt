@@ -1,0 +1,39 @@
+
+Rabiscos gerais para relembrar coisas da reunião:
+
+** Foco no método para resolução de variáveis do código embutido
+
+Esboço de título para nortear o foco
+"embedding languages preserving lexical scoping"
+(talvez ainda esteja confuso para ser título pelo fato de a linguagem do
+exemplo a ser mostrado é subset da mesma linguagem sendo embutida...)
+
+"código em linguagem X embutido em linguagem Y, gerando linguagem Z"
+
+Um rascunho de estrutura (nossos papers de 2013 e 2012 também tinham 5
+seções mais ou menos assim. Related Work no meio tá meio bizarro mas
+estranhamente me pareceu o mais lógico. Talvez inverter 3 e 4 seja
+uma solução simples.)
+
+1 Introduction
+
+motivação para embutir uma linguagem em outra: DSLs
+	
+2 Embedding languages
+
+problemas com interpolação de strings: escaping, quoting, SQL injection, etc.
+
+3 Related work
+
+abordagens que vão além de strings embutidas
+	LINQ
+	Terra (Stanford)
+
+4 LuaToAST
+
+abordagem com decompilador + gerador de AST
+
+5 Conclusion
+
+abordagem captura variáveis propriamente (não apenas no momento da conversão)
+(uma vantagem possível?: função pode ser usada nos dois modos, nativo e AST)
