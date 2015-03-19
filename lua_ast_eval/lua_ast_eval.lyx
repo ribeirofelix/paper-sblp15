@@ -78,7 +78,7 @@ key "terra"
 \end_inset
 
 .
- This subset captures the notions of lexing scoping, closures and side-effects
+ This subset depicts the notions of lexical scoping, closures and side-effects
  and is therefore sufficient for our purposes.
  We extend the Lua Core specification from 
 \begin_inset CommandInset citation
@@ -322,7 +322,7 @@ p\,\mbox{fresh}\,\,\,\,\,\,\,\,\,\, e_{2},(\Gamma_{2}[x\leftarrow p],S_{2}[p\lef
 \[
 \frac{\begin{array}[t]{c}
 e_{1},\Sigma_{1}\rightarrow\left\langle \Gamma_{1},x,e_{3}\right\rangle ,\Sigma_{2}\,\,\,\,\,\,\,\,\,\, e_{2},\Sigma_{2}\rightarrow v_{1},(\Gamma_{3},S_{3})\\
-\mbox{\ensuremath{p}\, fresh}\,\,\,\,\,\,\,\,\,\, e_{3},(\Gamma_{1}[x\leftarrow p],S_{3}[p\leftarrow v_{1}])\rightarrow v_{2},(\Gamma_{4},S_{4})
+\mbox{\ensuremath{p}\,\ fresh}\,\,\,\,\,\,\,\,\,\, e_{3},(\Gamma_{1}[x\leftarrow p],S_{3}[p\leftarrow v_{1}])\rightarrow v_{2},(\Gamma_{4},S_{4})
 \end{array}}{e_{1}(e_{2}),\Sigma_{1}\rightarrow v_{2},(\Gamma_{3},S_{4})}\textsc{ (LApp)}
 \]
 
