@@ -105,7 +105,7 @@ Lua Core syntax is presented as follows:
 \begin_layout Standard
 \begin_inset Formula 
 \[
-e=b\,|\, x\,|\,\mbox{let \ensuremath{x=e}in \ensuremath{e}}\,|\, x\coloneqq e\,|\, e(e)\,|\,\mbox{fun}(x)\{e\}\,|\, e\mbox{ op }e\,|\,\mbox{toAST}(e)\,|\,\mbox{compile}(a)
+e=b\,|\, x\,|\,\mbox{let \ensuremath{x=e}\, in\,\ensuremath{e}}\,|\, x\coloneqq e\,|\, e(e)\,|\,\mbox{fun}(x)\{e\}\,|\, e\mbox{ op }e\,|\,\mbox{toAST}(e)\,|\,\mbox{compile}(a)
 \]
 
 \end_inset
@@ -123,7 +123,7 @@ Lua expressions can be base values (
 \end_inset
 
 ), a scoped variable definition (
-\begin_inset Formula $\mbox{let \ensuremath{x=e}in \ensuremath{e}}$
+\begin_inset Formula $\mbox{let \ensuremath{x=e}\, in\,\ensuremath{e}}$
 \end_inset
 
 , with 
@@ -131,7 +131,7 @@ Lua expressions can be base values (
 \end_inset
 
  as sugar for 
-\begin_inset Formula $\mbox{let \ensuremath{\_=e}in \ensuremath{e}}$
+\begin_inset Formula $\mbox{let \ensuremath{\_=e}\, in\,\ensuremath{e}}$
 \end_inset
 
 ), a variable assignment (
@@ -162,7 +162,7 @@ Lua expressions can be base values (
 \begin_inset Formula $e\mbox{ op }e$
 \end_inset
 
-, with semantics defined by the function 
+, with semantics defined by a function 
 \begin_inset Formula $Op$
 \end_inset
 
@@ -208,7 +208,7 @@ Lua values can be base values (
 \begin_layout Standard
 \begin_inset Formula 
 \[
-a=[\mbox{base \ensuremath{b}}]\,|\,[\mbox{closure }\left\langle \Gamma,x,e\right\rangle ]\,|\,[\mbox{op \ensuremath{a}\ensuremath{a}}]
+a=[\mbox{base \ensuremath{b}}]\,|\,[\mbox{closure }\left\langle \Gamma,x,e\right\rangle ]\,|\,[\mbox{op\,\ensuremath{a}\,\ensuremath{a}}]
 \]
 
 \end_inset
@@ -222,11 +222,11 @@ A Lua AST may contain nodes that wrap base values
  
 \emph default
 (
-\emph on
-
 \begin_inset Formula $[\mbox{base }b]$
 \end_inset
 
+
+\emph on
 ), 
 \emph default
 closures (
@@ -234,7 +234,7 @@ closures (
 \end_inset
 
 ) and operations (
-\begin_inset Formula $[\mbox{op }\, a\, a]$
+\begin_inset Formula $[\mbox{op}\, a\, a]$
 \end_inset
 
 ).
@@ -309,7 +309,7 @@ v,\Sigma\rightarrow v,\Sigma\textsc{ (LVal)}
 \frac{\begin{array}[t]{c}
 e_{1},\Sigma_{1}\rightarrow v_{1},(\Gamma_{2},S_{2})\\
 p\,\mbox{fresh}\,\,\,\,\,\,\,\,\,\, e_{2},(\Gamma_{2}[x\leftarrow p],S_{2}[p\leftarrow v_{1}])\rightarrow v_{2},(\Gamma_{3},S_{3})
-\end{array}}{\mbox{let \ensuremath{x=e_{1}}in \ensuremath{e_{2}}},\Sigma_{1}\rightarrow v_{2},(\Gamma_{2},S_{3})}\textsc{ (LLet)}
+\end{array}}{\mbox{let \ensuremath{x=e_{1}}\, in\,\ensuremath{e_{2}}},\Sigma_{1}\rightarrow v_{2},(\Gamma_{2},S_{3})}\textsc{ (LLet)}
 \]
 
 \end_inset
@@ -423,7 +423,7 @@ b,\Sigma\overset{D}{\rightarrow}[\mbox{base }b]\textsc{ (DBase)}
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\frac{e_{1},\Sigma\overset{D}{\rightarrow}a_{1}\,\,\,\,\,\,\,\,\,\, e_{2},\Sigma\overset{D}{\rightarrow}a_{2}}{e_{1}\mbox{ op }e_{2},\Sigma\overset{D}{\rightarrow}[\mbox{op \ensuremath{a_{1}}\ensuremath{a_{2}}}]}\textsc{ (DOp)}
+\frac{e_{1},\Sigma\overset{D}{\rightarrow}a_{1}\,\,\,\,\,\,\,\,\,\, e_{2},\Sigma\overset{D}{\rightarrow}a_{2}}{e_{1}\mbox{ op }e_{2},\Sigma\overset{D}{\rightarrow}[\mbox{op\,\ensuremath{a_{1}\,}\ensuremath{a_{2}}}]}\textsc{ (DOp)}
 \]
 
 \end_inset
@@ -478,7 +478,7 @@ Finally, the rules for compiling Lua ASTs (
 \begin_layout Standard
 \begin_inset Formula 
 \[
-\frac{a_{1},\Sigma\overset{C}{\rightarrow}e_{1}\,\,\,\,\,\,\,\,\,\, a_{2},\Sigma\overset{C}{\rightarrow}e_{2}}{[\mbox{op \ensuremath{a_{1}}\ensuremath{a_{2}}}],\Sigma\overset{C}{\rightarrow}e_{1}\mbox{ op }e_{2}}\textsc{ (COp)}
+\frac{a_{1},\Sigma\overset{C}{\rightarrow}e_{1}\,\,\,\,\,\,\,\,\,\, a_{2},\Sigma\overset{C}{\rightarrow}e_{2}}{[\mbox{op\,\ensuremath{a_{1}}\ensuremath{\, a_{2}}}],\Sigma\overset{C}{\rightarrow}e_{1}\mbox{ op }e_{2}}\textsc{ (COp)}
 \]
 
 \end_inset
