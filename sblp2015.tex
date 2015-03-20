@@ -1,7 +1,11 @@
-\documentclass{llncs}
+\documentclass[english]{llncs}
 
 \usepackage{url}
 \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage{babel}
 
 \title{Embedding Languages Preserving Lexical Scoping}
 
@@ -31,23 +35,14 @@ Embedded Languages
 \end{abstract}
 
 \input{sections/introduction}
-\label{sec:intro}
-
-% soh para incluir a bibliografia no template
-% otherwise not compilation :)
-Lisp \cite{mccarthy:lisp}
-
-\input{sections/embedding_languages}
-\label{sec:embedding}
-
-\input{sections/lua2AST} % eu acho Lua2AST mais legal... :)
-\label{sec:lua2ast}
 
 \input{sections/related_work}
-\label{sec:related}
+
+\input{sections/lua2AST}
+
+\input{sections/semantics}
 
 \input{sections/conclusions}
-\label{sec:conc}
 
 \bibliographystyle{splncs_srt}
 \bibliography{sblp2015}
