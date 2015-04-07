@@ -1,6 +1,6 @@
 all: sblp2015.pdf
 
-sblp2015.pdf: sblp2015.tex sblp2015.bib 
+sblp2015.pdf: sblp2015.tex
 	pdflatex sblp2015.tex
 	bibtex sblp2015
 	pdflatex sblp2015.tex
