@@ -69,333 +69,24 @@
 \begin_body
 
 \begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-
-\size footnotesize
-\begin_inset Box Frameless
-position "t"
-hor_pos "c"
-has_inner_box 1
-inner_pos "t"
-use_parbox 0
-use_makebox 0
-width "59col%"
-special "none"
-height "1in"
-height_special "totalheight"
-status open
-
-\begin_layout Plain Layout
-
-\size footnotesize
-\begin_inset Formula 
-\[
-v,\Sigma\rightarrow v,\Sigma\textsc{ (LVal)}
-\]
+In this section, we specify below the behavior of toAST() and compile()
+ by using the formalization of a subset of Lua semantics, presented in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "DeVito2013Terra"
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\size footnotesize
-\begin_inset Formula 
-\[
-\frac{\Sigma=(\Gamma,S)}{x,\Sigma\rightarrow S(\Gamma(x)),\Sigma}\textsc{ (LVar)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\size footnotesize
-\begin_inset Formula 
-\[
-\frac{\begin{array}[t]{c}
-e_{1},\Sigma_{1}\rightarrow v_{1},(\Gamma_{2},S_{2})\\
-p\,\mbox{fresh}\\
-e_{2},(\Gamma_{2}[x\leftarrow p],S_{2}[p\leftarrow v_{1}])\rightarrow v_{2},(\Gamma_{3},S_{3})
-\end{array}}{\mbox{let \ensuremath{x=e_{1}}\,\ in\,\ensuremath{e_{2}}},\Sigma_{1}\rightarrow v_{2},(\Gamma_{2},S_{3})}\textsc{ (LLet)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\size footnotesize
-\begin_inset Formula 
-\[
-\frac{\begin{array}[t]{c}
-e_{1},\Sigma_{1}\rightarrow\left\langle \Gamma_{1},x,e_{3}\right\rangle ,\Sigma_{2}\\
-e_{2},\Sigma_{2}\rightarrow v_{1},(\Gamma_{3},S_{3})\\
-\mbox{\ensuremath{p}\,\ fresh}\\
-e_{3},(\Gamma_{1}[x\leftarrow p],S_{3}[p\leftarrow v_{1}])\rightarrow v_{2},(\Gamma_{4},S_{4})
-\end{array}}{e_{1}(e_{2}),\Sigma_{1}\rightarrow v_{2},(\Gamma_{3},S_{4})}\textsc{ (LApp)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\size footnotesize
-\begin_inset Formula 
-\[
-\frac{e_{1},\Sigma_{1}\rightarrow v_{1},(\Gamma,S)\,\,\,\,\,\,\,\,\,\,\Gamma(x)=p}{x\coloneqq e,\Sigma\rightarrow v,(\Gamma,S[p\leftarrow v])}\textsc{ (LAsn)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\size footnotesize
-\begin_inset Formula 
-\[
-\frac{\Sigma=(\Gamma,S)}{\mbox{fun(\ensuremath{x})\{\ensuremath{e}\}},\Sigma\rightarrow\left\langle \Gamma,x,e\right\rangle ,\Sigma}\textsc{ (LFun)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\size footnotesize
-\begin_inset Formula 
-\[
-\frac{\begin{array}[t]{c}
-e_{1},\Sigma_{1}\rightarrow v_{1},\Sigma_{2}\,\,\,\,\,\,\,\,\,\, e_{2},\Sigma_{2}\rightarrow v_{2},\Sigma_{3}\\
-v_{3}=Op(v_{1},v_{2})
-\end{array}}{e_{1}\mbox{\, op\,}e_{2},\Sigma_{1}\rightarrow v_{3},\Sigma_{3}}\textsc{ (LOp)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\size footnotesize
-\begin_inset Formula 
-\[
-\frac{e_{1},\Sigma\rightarrow\left\langle \Gamma,x,e_{2}\right\rangle ,\Sigma\,\,\,\,\,\,\,\,\,\,\left\langle \Gamma,x,e_{2}\right\rangle ,\Sigma\overset{D}{\rightarrow}a}{\mbox{toAST(\ensuremath{e_{1}})},\Sigma\rightarrow a,\Sigma}\textsc{ (LAst)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\size footnotesize
-\begin_inset Formula 
-\[
-\frac{\Sigma=(\Gamma,S)\,\,\,\,\,\,\,\,\,\, a,\Sigma\overset{C}{\rightarrow}e}{\mbox{compile(\ensuremath{a})},\Sigma\rightarrow e,\Sigma}\textsc{ (LComp)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\begin_inset Box Frameless
-position "t"
-hor_pos "c"
-has_inner_box 1
-inner_pos "t"
-use_parbox 0
-use_makebox 0
-width "40col%"
-special "none"
-height "1in"
-height_special "totalheight"
-status open
-
-\begin_layout Plain Layout
-
-\size footnotesize
-\begin_inset Formula 
-\[
-b,\Sigma\overset{D}{\rightarrow}[\mbox{base }b]\textsc{ (DBase)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\size footnotesize
-\begin_inset Formula 
-\[
-\frac{\Sigma=(\Gamma,S,F)}{x,\Sigma\overset{D}{\rightarrow}[\mbox{var }\left\langle \Gamma,\_,x\right\rangle ]}\textsc{ (DVar)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\size footnotesize
-\begin_inset Formula 
-\[
-\frac{e_{1},\Sigma\overset{D}{\rightarrow}a_{1}\,\,\,\,\,\,\,\,\,\, e_{2},\Sigma\overset{D}{\rightarrow}a_{2}}{e_{1}\mbox{ op }e_{2},\Sigma\overset{D}{\rightarrow}[\mbox{op\,\ensuremath{a_{1}\,}\ensuremath{a_{2}}}]}\textsc{ (DOp)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\size footnotesize
-\begin_inset Formula 
-\[
-\frac{e,\Sigma\overset{D}{\rightarrow}a}{\left\langle \Gamma,x,e\right\rangle ,\Sigma\overset{D}{\rightarrow}[\mbox{fn }x\, a]}\textsc{ (DFn)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\size footnotesize
-\begin_inset Formula 
-\[
-[\mbox{base \ensuremath{b}}],\Sigma\overset{C}{\rightarrow}b,\Sigma\textsc{ (CBase)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\size footnotesize
-\begin_inset Formula 
-\[
-\frac{\begin{array}[t]{c}
-\Sigma=(\Gamma,S)\\
-e_{1},(\Gamma_{1},S)\rightarrow v_{1},\Sigma_{2}
-\end{array}}{[\mbox{var }\left\langle \Gamma_{1},\_,e_{1}\right\rangle ],\Sigma\overset{C}{\rightarrow}v_{1}}\textsc{ (CVar)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\size footnotesize
-\begin_inset Formula 
-\[
-\frac{a_{1},\Sigma\overset{C}{\rightarrow}e_{1}\,\,\,\,\,\,\,\,\,\, a_{2},\Sigma\overset{C}{\rightarrow}e_{2}}{[\mbox{op\,\ensuremath{a_{1}}\ensuremath{\, a_{2}}}],\Sigma\overset{C}{\rightarrow}e_{1}\mbox{ op }e_{2}}\textsc{ (COp)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\size footnotesize
-\begin_inset Formula 
-\[
-\frac{a,\Sigma\overset{C}{\rightarrow}e}{[\mbox{fn }x\, a],\Sigma\overset{C}{\rightarrow}\left\langle \Gamma,x,e\right\rangle }\textsc{ (CFn)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-Rules 
-\begin_inset Formula $\rightarrow$
-\end_inset
-
- for the evaluation of Lua expressions, 
-\begin_inset Formula $\overset{D}{\rightarrow}$
-\end_inset
-
- for decompiling Lua expressions into ASTs, and 
-\begin_inset Formula $\overset{C}{\rightarrow}$
-\end_inset
-
- for compiling ASTs back into expressions.
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
+ as Lua Core.
+ We use the same formal framework of that work in order to properly compare
+ and contrast our approach for multi-stage programming to that employed
+ by Terra.
 \end_layout
 
 \begin_layout Standard
-We specify below the behavior of toAST() and compile() by using the formalizatio
-n of a subset of Lua semantics, as presented (as Lua Core) in 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "terra"
-
-\end_inset
-
-.
- This subset depicts the notions of lexical scoping, closures and side-effects
- and is therefore sufficient for our purposes.
- We extend the Lua Core specification from 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "terra"
-
-\end_inset
-
- with a general 
+Lua Core depicts the notions of lexical scoping, closures and side-effects
+ present in Lua, and is therefore mostly sufficient for our purposes.
+ We extend this specification with an arbitrary 
 \begin_inset Quotes eld
 \end_inset
 
@@ -403,18 +94,47 @@ binary operator
 \begin_inset Quotes erd
 \end_inset
 
- expression, mimicking Lua operators supported by LuaToAST.
+ expression, mimicking Lua operators supported by Lua2AST.
+ This way, we have a recursive rule through which we can model Lua expressions
+ as trees, to be later converted to ASTs.
+ We also include toAST() and compile() as core language operations so we
+ can specify their semantics separately from plain functions.
 \end_layout
 
 \begin_layout Standard
-Lua Core syntax is presented as follows:
-\end_layout
+\begin_inset Float figure
+placement t
+wide false
+sideways false
+status open
 
-\begin_layout Standard
+\begin_layout Plain Layout
 \begin_inset Formula 
-\[
-e=b\,|\, x\,|\,\mbox{let \ensuremath{x=e}\,\ in\,\ensuremath{e}}\,|\, x\coloneqq e\,|\, e(e)\,|\,\mbox{fun}(x)\{e\}\,|\, e\mbox{ op }e\,|\,\mbox{toAST}(e)\,|\,\mbox{compile}(a)
-\]
+\begin{eqnarray*}
+e & = & b\,|\, x\,|\,\mbox{let \ensuremath{x=e}\,\ in\,\ensuremath{e}}\,|\, x\coloneqq e\,|\, e(e)\,|\,\mbox{fun}(x)\{e\}\,|\, e\mbox{ op }e\,|\,\mbox{toAST}(e)\,|\,\mbox{compile}(a)\\
+v & = & b\,|\,\left\langle \Gamma,x,e\right\rangle \,|\, a\\
+a & = & [\mbox{fn\,\ensuremath{x}\,\ensuremath{a}}]\,|\,[\mbox{base \ensuremath{b}}]\,|\,[\mbox{var}\, x\,\left\langle \Gamma,x,e\right\rangle ]\,|\,[\mbox{op\,\ensuremath{a}\,\ensuremath{a}}]
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:LuaCoreSyntax"
+
+\end_inset
+
+Syntax of our version of Lua Core, extended with constructs to specify Lua2AST
+\end_layout
+
+\end_inset
+
+
+\end_layout
 
 \end_inset
 
@@ -422,7 +142,19 @@ e=b\,|\, x\,|\,\mbox{let \ensuremath{x=e}\,\ in\,\ensuremath{e}}\,|\, x\coloneqq
 \end_layout
 
 \begin_layout Standard
-Lua expressions can be base values (
+The syntax of our version of Lua Core is presented in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:LuaCoreSyntax"
+
+\end_inset
+
+.
+ Lua expressions (
+\begin_inset Formula $e$
+\end_inset
+
+) can be base values (
 \begin_inset Formula $b$
 \end_inset
 
@@ -475,30 +207,80 @@ Lua expressions can be base values (
 \end_inset
 
 ).
- We extend this by adding operations toAST(
+ We extend this by adding operations 
+\family default
+\series default
+\shape default
+\size default
+\emph on
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+toAST(
 \begin_inset Formula $e$
 \end_inset
 
-) and compile(
+)
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ and 
+\family default
+\series default
+\shape default
+\size default
+\emph on
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+compile(
 \begin_inset Formula $a$
 \end_inset
 
-).
-\end_layout
+)
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+.
 
-\begin_layout Standard
-\begin_inset Formula 
-\[
-v=b\,|\,\left\langle \Gamma,x,e\right\rangle \,|\, a
-\]
-
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ Lua values (
+\begin_inset Formula $v$
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-Lua values can be base values (
+) can be base values (
 \begin_inset Formula $b$
 \end_inset
 
@@ -511,21 +293,7 @@ Lua values can be base values (
 \end_inset
 
 ).
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-a=[\mbox{fn\,\ensuremath{x}\,\ensuremath{a}}]\,|\,[\mbox{base \ensuremath{b}}]\,|\,[\mbox{var }\left\langle \Gamma,x,e\right\rangle ]\,|\,[\mbox{op\,\ensuremath{a}\,\ensuremath{a}}]
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-A Lua AST for a function consists of a root node (
+ A Lua AST for a function consists of a root node (
 \begin_inset Formula $[\mbox{fn\,\ensuremath{x}\,\ensuremath{a}}]$
 \end_inset
 
@@ -542,7 +310,7 @@ A Lua AST for a function consists of a root node (
 ), 
 \emph default
 variables (
-\begin_inset Formula $[\mbox{var }\left\langle \Gamma,x,e\right\rangle ]$
+\begin_inset Formula $[\mbox{var }x\,\left\langle \Gamma,x,e\right\rangle ]$
 \end_inset
 
 ) and operations (
@@ -553,7 +321,334 @@ variables (
 \end_layout
 
 \begin_layout Standard
-The rules for evaluating Lua expressions over an environment 
+\begin_inset Float figure
+placement t
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\size footnotesize
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "59col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+
+\size footnotesize
+\begin_inset Formula 
+\[
+v,\Sigma\overset{L}{\rightarrow}v,\Sigma\textsc{ (LVal)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\size footnotesize
+\begin_inset Formula 
+\[
+\frac{\Sigma=(\Gamma,S)}{x,\Sigma\overset{L}{\rightarrow}S(\Gamma(x)),\Sigma}\textsc{ (LVar)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\size footnotesize
+\begin_inset Formula 
+\[
+\frac{\begin{array}[t]{c}
+e_{1},\Sigma_{1}\overset{L}{\rightarrow}v_{1},(\Gamma_{2},S_{2})\,\,\,\,\,\,\,\, p\,\mbox{fresh}\\
+e_{2},(\Gamma_{2}[x\leftarrow p],S_{2}[p\leftarrow v_{1}])\overset{L}{\rightarrow}v_{2},(\Gamma_{3},S_{3})
+\end{array}}{\mbox{let \ensuremath{x=e_{1}}\,\ in\,\ensuremath{e_{2}}},\Sigma_{1}\overset{L}{\rightarrow}v_{2},(\Gamma_{2},S_{3})}\textsc{ (LLet)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\size footnotesize
+\begin_inset Formula 
+\[
+\frac{\begin{array}[t]{c}
+e_{1},\Sigma_{1}\overset{L}{\rightarrow}\left\langle \Gamma_{1},x,e_{3}\right\rangle ,\Sigma_{2}\\
+e_{2},\Sigma_{2}\overset{L}{\rightarrow}v_{1},(\Gamma_{3},S_{3})\,\,\,\,\,\,\,\,\mbox{\ensuremath{p}\ fresh}\\
+e_{3},(\Gamma_{1}[x\leftarrow p],S_{3}[p\leftarrow v_{1}])\overset{L}{\rightarrow}v_{2},(\Gamma_{4},S_{4})
+\end{array}}{e_{1}(e_{2}),\Sigma_{1}\overset{L}{\rightarrow}v_{2},(\Gamma_{3},S_{4})}\textsc{ (LApp)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\size footnotesize
+\begin_inset Formula 
+\[
+\frac{e_{1},\Sigma_{1}\overset{L}{\rightarrow}v_{1},(\Gamma,S)\,\,\,\,\,\,\,\,\Gamma(x)=p}{x\coloneqq e,\Sigma\overset{L}{\rightarrow}v,(\Gamma,S[p\leftarrow v])}\textsc{ (LAsn)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\size footnotesize
+\begin_inset Formula 
+\[
+\frac{\Sigma=(\Gamma,S)}{\mbox{fun(\ensuremath{x})\{\ensuremath{e}\}},\Sigma\overset{L}{\rightarrow}\left\langle \Gamma,x,e\right\rangle ,\Sigma}\textsc{ (LFun)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\size footnotesize
+\begin_inset Formula 
+\[
+\frac{\begin{array}[t]{c}
+e_{1},\Sigma_{1}\overset{L}{\rightarrow}v_{1},\Sigma_{2}\,\,\,\,\,\,\,\, e_{2},\Sigma_{2}\overset{L}{\rightarrow}v_{2},\Sigma_{3}\\
+v_{3}=Op(v_{1},v_{2})
+\end{array}}{e_{1}\mbox{\, op\,}e_{2},\Sigma_{1}\overset{L}{\rightarrow}v_{3},\Sigma_{3}}\textsc{ (LOp)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\size footnotesize
+\begin_inset Formula 
+\[
+\frac{e_{1},\Sigma_{1}\overset{L}{\rightarrow}\left\langle \Gamma,x,e_{2}\right\rangle ,\Sigma_{2}\,\,\,\,\,\,\,\,\left\langle \Gamma,x,e_{2}\right\rangle ,\Sigma_{2}\overset{D}{\rightarrow}a}{\mbox{toAST(\ensuremath{e_{1}})},\Sigma_{1}\overset{L}{\rightarrow}a,\Sigma_{2}}\textsc{ (LAst)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\size footnotesize
+\begin_inset Formula 
+\[
+\frac{a,\Sigma_{1}\overset{C}{\rightarrow}e,\Sigma_{2}}{\mbox{compile(\ensuremath{a})},\Sigma_{1}\rightarrow e,\Sigma_{2}}\textsc{ (LComp)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "40col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+
+\size footnotesize
+\begin_inset Formula 
+\[
+b,\Sigma\overset{D}{\rightarrow}[\mbox{base }b]\textsc{ (DBase)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\size footnotesize
+\begin_inset Formula 
+\[
+\frac{\begin{array}[t]{c}
+\Sigma=(\Gamma,S)\\
+x'\,\mbox{fresh}
+\end{array}}{x,\Sigma\overset{D}{\rightarrow}[\mbox{var }x'\,\left\langle \Gamma,\_,x\right\rangle ]}\textsc{ (DVar)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\size footnotesize
+\begin_inset Formula 
+\[
+\frac{e_{1},\Sigma\overset{D}{\rightarrow}a_{1}\,\,\,\,\,\,\,\, e_{2},\Sigma\overset{D}{\rightarrow}a_{2}}{e_{1}\mbox{ op }e_{2},\Sigma\overset{D}{\rightarrow}[\mbox{op\,\ensuremath{a_{1}\,}\ensuremath{a_{2}}}]}\textsc{ (DOp)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\size footnotesize
+\begin_inset Formula 
+\[
+\frac{e,\Sigma\overset{D}{\rightarrow}a}{\left\langle \Gamma,x,e\right\rangle ,\Sigma\overset{D}{\rightarrow}[\mbox{fn }x\, a]}\textsc{ (DFn)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\size footnotesize
+\begin_inset Formula 
+\[
+[\mbox{base \ensuremath{b}}],\Sigma\overset{C}{\rightarrow}b,\Sigma\textsc{ (CBase)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\size footnotesize
+\begin_inset Formula 
+\[
+\frac{\begin{array}[t]{c}
+\Sigma_{1}=(\Gamma,S)\\
+p\,\mbox{fresh}\\
+\Sigma_{2}=(\Gamma[x'\leftarrow p],S[p\leftarrow f])
+\end{array}}{[\mbox{var }x'\, f],\Sigma_{1}\overset{C}{\rightarrow}x'(\_),\Sigma_{2}}\textsc{ (CVar)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\size footnotesize
+\begin_inset Formula 
+\[
+\frac{a_{1},\Sigma_{1}\overset{C}{\rightarrow}e_{1},\Sigma_{2}\,\,\,\,\,\,\,\, a_{2},\Sigma_{2}\overset{C}{\rightarrow}e_{2},\Sigma_{3}}{[\mbox{op\,\ensuremath{a_{1}}\ensuremath{\, a_{2}}}],\Sigma_{1}\overset{C}{\rightarrow}e_{1}\mbox{ op }e_{2},\Sigma_{3}}\textsc{ (COp)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\size footnotesize
+\begin_inset Formula 
+\[
+\frac{\begin{array}[t]{c}
+\Sigma_{1}=(\Gamma_{1},S_{1})\\
+a,\Sigma_{1}\overset{C}{\rightarrow}e,(\Gamma_{2},S_{2})
+\end{array}}{[\mbox{fn }x\, a],\Sigma_{1}\overset{C}{\rightarrow}\left\langle \Gamma_{2},x,e\right\rangle ,(\Gamma_{1},S_{2})}\textsc{ (CFn)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Semantics"
+
+\end_inset
+
+Rules 
+\begin_inset Formula $\overset{L}{\rightarrow}$
+\end_inset
+
+ for the evaluation of Lua expressions, 
+\begin_inset Formula $\overset{D}{\rightarrow}$
+\end_inset
+
+ for decompiling Lua expressions into ASTs, and 
+\begin_inset Formula $\overset{C}{\rightarrow}$
+\end_inset
+
+ for compiling ASTs back into expressions.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Semantics"
+
+\end_inset
+
+, we present the rules for evaluating Lua Core over an environment 
 \begin_inset Formula $\Sigma$
 \end_inset
 
@@ -573,185 +668,59 @@ The rules for evaluating Lua expressions over an environment
 \begin_inset Formula $p$
 \end_inset
 
- are memory positions) are as follows.
+ are memory positions).
  We use 
-\begin_inset Formula $\rightarrow$
-\end_inset
-
- instead of 
 \begin_inset Formula $\overset{L}{\rightarrow}$
 \end_inset
 
- as in 
+ for the evaluation of Lua expressions as in 
 \begin_inset CommandInset citation
 LatexCommand cite
-key "terra"
+key "DeVito2013Terra"
 
 \end_inset
 
 ; where rules have the same names, they have the same semantics as those
  presented in that work.
+ We added rules 
+\shape smallcaps
+LOp
+\shape default
+ for the binary operation, 
+\shape smallcaps
+LAst
+\shape default
+ for the 
+\begin_inset Formula $toAST()$
+\end_inset
+
+ function and 
+\shape smallcaps
+LComp
+\shape default
+ for the 
+\emph on
+compile
+\emph default
+() function.
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula 
-\[
-v,\Sigma\rightarrow v,\Sigma\textsc{ (LVal)}
-\]
-
+We also add two other relations: rules for decompiling a Lua function into
+ an AST (
+\begin_inset Formula $\overset{D}{\rightarrow}:(e\times\Sigma)\rightarrow a$
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-\frac{\Sigma=(\Gamma,S)}{x,\Sigma\rightarrow S(\Gamma(x)),\Sigma}\textsc{ (LVar)}
-\]
-
+) and rules for compiling ASTs back into Lua functions (
+\begin_inset Formula $\overset{C}{\rightarrow}:(a\times\Sigma)\rightarrow(e\times\Sigma)$
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-\frac{\begin{array}[t]{c}
-e_{1},\Sigma_{1}\rightarrow v_{1},(\Gamma_{2},S_{2})\\
-p\,\mbox{fresh}\,\,\,\,\,\,\,\,\,\, e_{2},(\Gamma_{2}[x\leftarrow p],S_{2}[p\leftarrow v_{1}])\rightarrow v_{2},(\Gamma_{3},S_{3})
-\end{array}}{\mbox{let \ensuremath{x=e_{1}}\,\ in\,\ensuremath{e_{2}}},\Sigma_{1}\rightarrow v_{2},(\Gamma_{2},S_{3})}\textsc{ (LLet)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-\frac{\begin{array}[t]{c}
-e_{1},\Sigma_{1}\rightarrow\left\langle \Gamma_{1},x,e_{3}\right\rangle ,\Sigma_{2}\,\,\,\,\,\,\,\,\,\, e_{2},\Sigma_{2}\rightarrow v_{1},(\Gamma_{3},S_{3})\\
-\mbox{\ensuremath{p}\,\ fresh}\,\,\,\,\,\,\,\,\,\, e_{3},(\Gamma_{1}[x\leftarrow p],S_{3}[p\leftarrow v_{1}])\rightarrow v_{2},(\Gamma_{4},S_{4})
-\end{array}}{e_{1}(e_{2}),\Sigma_{1}\rightarrow v_{2},(\Gamma_{3},S_{4})}\textsc{ (LApp)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-\frac{e_{1},\Sigma_{1}\rightarrow v_{1},(\Gamma,S)\,\,\,\,\,\,\,\,\,\,\Gamma(x)=p}{x\coloneqq e,\Sigma\rightarrow v,(\Gamma,S[p\leftarrow v])}\textsc{ (LAsn)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-\frac{\Sigma=(\Gamma,S)}{\mbox{fun(\ensuremath{x})\{\ensuremath{e}\}},\Sigma\rightarrow\left\langle \Gamma,x,e\right\rangle ,\Sigma}\textsc{ (LFun)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-\frac{e_{1},\Sigma_{1}\rightarrow v_{1},\Sigma_{2}\,\,\,\,\,\,\,\,\,\, e_{2},\Sigma_{2}\rightarrow v_{2},\Sigma_{3}\,\,\,\,\,\,\,\,\,\, v_{3}=Op(v_{1},v_{2})}{e_{1}\mbox{\, op\,}e_{2},\Sigma_{1}\rightarrow v_{3},\Sigma_{3}}\textsc{ (LOp)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-\frac{e_{1},\Sigma\rightarrow\left\langle \Gamma,x,e_{2}\right\rangle ,\Sigma\,\,\,\,\,\,\,\,\,\,\left\langle \Gamma,x,e_{2}\right\rangle ,\Sigma\overset{D}{\rightarrow}a}{\mbox{toAST(\ensuremath{e_{1}})},\Sigma\rightarrow a,\Sigma}\textsc{ (LAst)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-\frac{\Sigma=(\Gamma,S)\,\,\,\,\,\,\,\,\,\, a,\Sigma\overset{C}{\rightarrow}e}{\mbox{compile(\ensuremath{a})},\Sigma\rightarrow e,\Sigma}\textsc{ (LComp)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The rules for decompiling Lua expressions (
-\begin_inset Formula $\overset{D}{\rightarrow}$
-\end_inset
-
-) over an environment 
-\begin_inset Formula $\Sigma$
-\end_inset
-
- are the following:
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-b,\Sigma\overset{D}{\rightarrow}[\mbox{base }b]\textsc{ (DBase)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-\frac{\Sigma=(\Gamma,S,F)}{x,\Sigma\overset{D}{\rightarrow}[\mbox{var }\left\langle \Gamma,\_,x\right\rangle ]}\textsc{ (DVar)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-\frac{e_{1},\Sigma\overset{D}{\rightarrow}a_{1}\,\,\,\,\,\,\,\,\,\, e_{2},\Sigma\overset{D}{\rightarrow}a_{2}}{e_{1}\mbox{ op }e_{2},\Sigma\overset{D}{\rightarrow}[\mbox{op\,\ensuremath{a_{1}\,}\ensuremath{a_{2}}}]}\textsc{ (DOp)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-\frac{e,\Sigma\overset{D}{\rightarrow}a}{\left\langle \Gamma,x,e\right\rangle ,\Sigma\overset{D}{\rightarrow}[\mbox{fn }x\, a]}\textsc{ (DFn)}
-\]
-
-\end_inset
-
-
+).
+ In our formalization, decompiling the function produces an AST but does
+ not affect the environment; all values produced are stored in the AST itself.
+ Compiling returns an environment with an unmodified namespace and a modified
+ store which includes the required closures.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -759,92 +728,117 @@ Note that
 \begin_inset Formula $\overset{D}{\rightarrow}$
 \end_inset
 
- is defined only for variables, base values and the operator, mirroring
- the implementation of LuaToAST.
- 
-\end_layout
-
-\begin_layout Standard
-Finally, the rules for compiling Lua ASTs (
-\begin_inset Formula $\overset{C}{\rightarrow}$
+ is defined only for variables (
+\shape smallcaps
+DVar
+\shape default
+), base values (
+\shape smallcaps
+DBase
+\shape default
+), the binary operator (
+\shape smallcaps
+DOp
+\shape default
+), and the initial function (
+\shape smallcaps
+DFn
+\shape default
+), mirroring the implementation of 
+\emph on
+toAST
+\emph default
+() in LuaToAST.
+ Its rules deconstruct the body of the function and build the corresponding
+ AST.
+ Of particular interest is rule 
+\shape smallcaps
+DVar
+\shape default
+, which stores in the AST node a fresh variable 
+\begin_inset Formula $x'$
 \end_inset
 
-) over an environment 
-\begin_inset Formula $\Sigma$
+ (i.e.
+ one guaranteed not to exist in 
+\begin_inset Formula $\Gamma$
 \end_inset
 
- are:
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-[\mbox{base \ensuremath{b}}],\Sigma\overset{C}{\rightarrow}b,\Sigma\textsc{ (CBase)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-\frac{\Sigma=(\Gamma,S)\,\,\,\,\,\,\,\,\,\, e_{1},(\Gamma_{1},S)\rightarrow v_{1},\Sigma_{2}}{[\mbox{var }\left\langle \Gamma_{1},\_,e_{1}\right\rangle ],\Sigma\overset{C}{\rightarrow}v_{1}}\textsc{ (CVar)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-\frac{a_{1},\Sigma\overset{C}{\rightarrow}e_{1}\,\,\,\,\,\,\,\,\,\, a_{2},\Sigma\overset{C}{\rightarrow}e_{2}}{[\mbox{op\,\ensuremath{a_{1}}\ensuremath{\, a_{2}}}],\Sigma\overset{C}{\rightarrow}e_{1}\mbox{ op }e_{2}}\textsc{ (COp)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-\frac{a,\Sigma\overset{C}{\rightarrow}e}{[\mbox{fn }x\, a],\Sigma\overset{C}{\rightarrow}\left\langle \Gamma,x,e\right\rangle }\textsc{ (CFn)}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The evaluation of variables 
+) and a newly created closure, which returns the value of 
 \begin_inset Formula $x$
 \end_inset
 
- happens only at compilation time, as evidenced by the evaluation of 
-\begin_inset Formula $e_{1}$
-\end_inset
-
- using 
-\begin_inset Formula $\rightarrow$
-\end_inset
-
- in rule 
+ given the original function's environment.
+ In the complementary rule 
 \shape smallcaps
 CVar
 \shape default
+, this new variable 
+\begin_inset Formula $x'$
+\end_inset
+
+ is assigned in the resulting environment to hold the node's closure 
+\begin_inset Formula $f$
+\end_inset
+
 .
- 
+ Note in rule 
+\shape smallcaps
+CFn
+\shape default
+ that the derived namespace 
+\begin_inset Formula $\Gamma_{2}$
+\end_inset
+
+ is used only in the resulting closure, whereas the derived store 
+\begin_inset Formula $S_{2}$
+\end_inset
+
+ is used in the resulting environment.
+ In 
+\begin_inset Formula $\Gamma_{2}$
+\end_inset
+
+, all variable references that existed in the original function that was
+ decompiled and now recompiled were replaced by calls to newly-created closures
+ that merely return the value of the corresponding variables.
+\end_layout
+
+\begin_layout Standard
+These closures use the original namespace from decompilation time (
+\begin_inset Formula $\Gamma$
+\end_inset
+
+ in 
+\shape smallcaps
+DVar
+\shape default
+), so the variable references are bound to the addresses they have in the
+ lexical scope where decompilation takes place.
+ Any variable 
+\begin_inset Formula $x$
+\end_inset
+
+ stored in an AST will only be evaluated when the compiled function returned
+ by 
+\begin_inset Formula $compile(a)$
+\end_inset
+
+ is called, and the call to wrapper closure 
+\begin_inset Formula $x'()$
+\end_inset
+
+ will ensure that 
+\begin_inset Formula $x$
+\end_inset
+
+ is tied to its original namespace.
 \end_layout
 
 \begin_layout Bibliography
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
-key "terra"
+key "DeVito2013Terra"
 
 \end_inset
 

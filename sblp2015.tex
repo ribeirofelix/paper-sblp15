@@ -134,76 +134,97 @@ In this way the user can utilize the returned function that is the compilation o
 \section{Semantics}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\label{sec:evaluation_semantics}
+\label{sec:semantics}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In this section, we specify below the behavior of toAST() and compile()
+by using the formalization of a subset of Lua semantics, presented
+in \cite{DeVito2013Terra} as Lua Core. We use the same formal framework
+of that work in order to properly compare and contrast our approach
+for multi-stage programming to that employed by Terra.
 
-\begin{figure}
+Lua Core depicts the notions of lexical scoping, closures and side-effects
+present in Lua, and is therefore mostly sufficient for our purposes.
+We extend this specification with an arbitrary ``binary operator''
+expression, mimicking Lua operators supported by Lua2AST. This way,
+we have a recursive rule through which we can model Lua expressions
+as trees, to be later converted to ASTs. We also include toAST() and
+compile() as core language operations so we can specify their semantics
+separately from plain functions.
+
+\begin{figure}[t]
+\begin{eqnarray*}
+e & = & b\,|\, x\,|\,\mbox{let \ensuremath{x=e}\,\ in\,\ensuremath{e}}\,|\, x\coloneqq e\,|\, e(e)\,|\,\mbox{fun}(x)\{e\}\,|\, e\mbox{ op }e\,|\,\mbox{toAST}(e)\,|\,\mbox{compile}(a)\\
+v & = & b\,|\,\left\langle \Gamma,x,e\right\rangle \,|\, a\\
+a & = & [\mbox{fn\,\ensuremath{x}\,\ensuremath{a}}]\,|\,[\mbox{base \ensuremath{b}}]\,|\,[\mbox{var}\, x\,\left\langle \Gamma,x,e\right\rangle ]\,|\,[\mbox{op\,\ensuremath{a}\,\ensuremath{a}}]
+\end{eqnarray*}
+\protect\caption{\label{fig:LuaCoreSyntax}Syntax of our version of Lua Core, extended
+with constructs to specify Lua2AST}
+\end{figure}
+
+\begin{figure}[!t]
 {\footnotesize{}}%
 \begin{minipage}[t]{0.59\columnwidth}%
 {\footnotesize{}
 \[
-v,\Sigma\rightarrow v,\Sigma\textsc{ (LVal)}
+v,\Sigma\overset{L}{\rightarrow}v,\Sigma\textsc{ (LVal)}
 \]
 }{\footnotesize \par}
 
 {\footnotesize{}
 \[
-\frac{\Sigma=(\Gamma,S)}{x,\Sigma\rightarrow S(\Gamma(x)),\Sigma}\textsc{ (LVar)}
-\]
-}{\footnotesize \par}
-
-{\footnotesize{}
-\[
-\frac{\begin{array}[t]{c}
-e_{1},\Sigma_{1}\rightarrow v_{1},(\Gamma_{2},S_{2})\\
-p\,\mbox{fresh}\\
-e_{2},(\Gamma_{2}[x\leftarrow p],S_{2}[p\leftarrow v_{1}])\rightarrow v_{2},(\Gamma_{3},S_{3})
-\end{array}}{\mbox{let \ensuremath{x=e_{1}}\,\ in\,\ensuremath{e_{2}}},\Sigma_{1}\rightarrow v_{2},(\Gamma_{2},S_{3})}\textsc{ (LLet)}
+\frac{\Sigma=(\Gamma,S)}{x,\Sigma\overset{L}{\rightarrow}S(\Gamma(x)),\Sigma}\textsc{ (LVar)}
 \]
 }{\footnotesize \par}
 
 {\footnotesize{}
 \[
 \frac{\begin{array}[t]{c}
-e_{1},\Sigma_{1}\rightarrow\left\langle \Gamma_{1},x,e_{3}\right\rangle ,\Sigma_{2}\\
-e_{2},\Sigma_{2}\rightarrow v_{1},(\Gamma_{3},S_{3})\\
-\mbox{\ensuremath{p}\,\ fresh}\\
-e_{3},(\Gamma_{1}[x\leftarrow p],S_{3}[p\leftarrow v_{1}])\rightarrow v_{2},(\Gamma_{4},S_{4})
-\end{array}}{e_{1}(e_{2}),\Sigma_{1}\rightarrow v_{2},(\Gamma_{3},S_{4})}\textsc{ (LApp)}
-\]
-}{\footnotesize \par}
-
-{\footnotesize{}
-\[
-\frac{e_{1},\Sigma_{1}\rightarrow v_{1},(\Gamma,S)\,\,\,\,\,\,\,\,\,\,\Gamma(x)=p}{x\coloneqq e,\Sigma\rightarrow v,(\Gamma,S[p\leftarrow v])}\textsc{ (LAsn)}
-\]
-}{\footnotesize \par}
-
-{\footnotesize{}
-\[
-\frac{\Sigma=(\Gamma,S)}{\mbox{fun(\ensuremath{x})\{\ensuremath{e}\}},\Sigma\rightarrow\left\langle \Gamma,x,e\right\rangle ,\Sigma}\textsc{ (LFun)}
+e_{1},\Sigma_{1}\overset{L}{\rightarrow}v_{1},(\Gamma_{2},S_{2})\,\,\,\,\,\,\,\, p\,\mbox{fresh}\\
+e_{2},(\Gamma_{2}[x\leftarrow p],S_{2}[p\leftarrow v_{1}])\overset{L}{\rightarrow}v_{2},(\Gamma_{3},S_{3})
+\end{array}}{\mbox{let \ensuremath{x=e_{1}}\,\ in\,\ensuremath{e_{2}}},\Sigma_{1}\overset{L}{\rightarrow}v_{2},(\Gamma_{2},S_{3})}\textsc{ (LLet)}
 \]
 }{\footnotesize \par}
 
 {\footnotesize{}
 \[
 \frac{\begin{array}[t]{c}
-e_{1},\Sigma_{1}\rightarrow v_{1},\Sigma_{2}\,\,\,\,\,\,\,\,\,\, e_{2},\Sigma_{2}\rightarrow v_{2},\Sigma_{3}\\
+e_{1},\Sigma_{1}\overset{L}{\rightarrow}\left\langle \Gamma_{1},x,e_{3}\right\rangle ,\Sigma_{2}\\
+e_{2},\Sigma_{2}\overset{L}{\rightarrow}v_{1},(\Gamma_{3},S_{3})\,\,\,\,\,\,\,\,\mbox{\ensuremath{p}\ fresh}\\
+e_{3},(\Gamma_{1}[x\leftarrow p],S_{3}[p\leftarrow v_{1}])\overset{L}{\rightarrow}v_{2},(\Gamma_{4},S_{4})
+\end{array}}{e_{1}(e_{2}),\Sigma_{1}\overset{L}{\rightarrow}v_{2},(\Gamma_{3},S_{4})}\textsc{ (LApp)}
+\]
+}{\footnotesize \par}
+
+{\footnotesize{}
+\[
+\frac{e_{1},\Sigma_{1}\overset{L}{\rightarrow}v_{1},(\Gamma,S)\,\,\,\,\,\,\,\,\Gamma(x)=p}{x\coloneqq e,\Sigma\overset{L}{\rightarrow}v,(\Gamma,S[p\leftarrow v])}\textsc{ (LAsn)}
+\]
+}{\footnotesize \par}
+
+{\footnotesize{}
+\[
+\frac{\Sigma=(\Gamma,S)}{\mbox{fun(\ensuremath{x})\{\ensuremath{e}\}},\Sigma\overset{L}{\rightarrow}\left\langle \Gamma,x,e\right\rangle ,\Sigma}\textsc{ (LFun)}
+\]
+}{\footnotesize \par}
+
+{\footnotesize{}
+\[
+\frac{\begin{array}[t]{c}
+e_{1},\Sigma_{1}\overset{L}{\rightarrow}v_{1},\Sigma_{2}\,\,\,\,\,\,\,\, e_{2},\Sigma_{2}\overset{L}{\rightarrow}v_{2},\Sigma_{3}\\
 v_{3}=Op(v_{1},v_{2})
-\end{array}}{e_{1}\mbox{\,\ op\,}e_{2},\Sigma_{1}\rightarrow v_{3},\Sigma_{3}}\textsc{ (LOp)}
+\end{array}}{e_{1}\mbox{\, op\,}e_{2},\Sigma_{1}\overset{L}{\rightarrow}v_{3},\Sigma_{3}}\textsc{ (LOp)}
 \]
 }{\footnotesize \par}
 
 {\footnotesize{}
 \[
-\frac{e_{1},\Sigma\rightarrow\left\langle \Gamma,x,e_{2}\right\rangle ,\Sigma\,\,\,\,\,\,\,\,\,\,\left\langle \Gamma,x,e_{2}\right\rangle ,\Sigma\overset{D}{\rightarrow}a}{\mbox{toAST(\ensuremath{e_{1}})},\Sigma\rightarrow a,\Sigma}\textsc{ (LAst)}
+\frac{e_{1},\Sigma_{1}\overset{L}{\rightarrow}\left\langle \Gamma,x,e_{2}\right\rangle ,\Sigma_{2}\,\,\,\,\,\,\,\,\left\langle \Gamma,x,e_{2}\right\rangle ,\Sigma_{2}\overset{D}{\rightarrow}a}{\mbox{toAST(\ensuremath{e_{1}})},\Sigma_{1}\overset{L}{\rightarrow}a,\Sigma_{2}}\textsc{ (LAst)}
 \]
 }{\footnotesize \par}
 
 {\footnotesize{}
 \[
-\frac{\Sigma=(\Gamma,S)\,\,\,\,\,\,\,\,\,\, a,\Sigma\overset{C}{\rightarrow}e}{\mbox{compile(\ensuremath{a})},\Sigma\rightarrow e,\Sigma}\textsc{ (LComp)}
+\frac{a,\Sigma_{1}\overset{C}{\rightarrow}e,\Sigma_{2}}{\mbox{compile(\ensuremath{a})},\Sigma_{1}\rightarrow e,\Sigma_{2}}\textsc{ (LComp)}
 \]
 }%
 \end{minipage}{\footnotesize{}}%
@@ -216,13 +237,16 @@ b,\Sigma\overset{D}{\rightarrow}[\mbox{base }b]\textsc{ (DBase)}
 
 {\footnotesize{}
 \[
-\frac{\Sigma=(\Gamma,S,F)}{x,\Sigma\overset{D}{\rightarrow}[\mbox{var }\left\langle \Gamma,\_,x\right\rangle ]}\textsc{ (DVar)}
+\frac{\begin{array}[t]{c}
+\Sigma=(\Gamma,S)\\
+x'\,\mbox{fresh}
+\end{array}}{x,\Sigma\overset{D}{\rightarrow}[\mbox{var }x'\,\left\langle \Gamma,\_,x\right\rangle ]}\textsc{ (DVar)}
 \]
 }{\footnotesize \par}
 
 {\footnotesize{}
 \[
-\frac{e_{1},\Sigma\overset{D}{\rightarrow}a_{1}\,\,\,\,\,\,\,\,\,\, e_{2},\Sigma\overset{D}{\rightarrow}a_{2}}{e_{1}\mbox{ op }e_{2},\Sigma\overset{D}{\rightarrow}[\mbox{op\,\ensuremath{a_{1}\,}\ensuremath{a_{2}}}]}\textsc{ (DOp)}
+\frac{e_{1},\Sigma\overset{D}{\rightarrow}a_{1}\,\,\,\,\,\,\,\, e_{2},\Sigma\overset{D}{\rightarrow}a_{2}}{e_{1}\mbox{ op }e_{2},\Sigma\overset{D}{\rightarrow}[\mbox{op\,\ensuremath{a_{1}\,}\ensuremath{a_{2}}}]}\textsc{ (DOp)}
 \]
 }{\footnotesize \par}
 
@@ -241,79 +265,95 @@ b,\Sigma\overset{D}{\rightarrow}[\mbox{base }b]\textsc{ (DBase)}
 {\footnotesize{}
 \[
 \frac{\begin{array}[t]{c}
-\Sigma=(\Gamma,S)\\
-e_{1},(\Gamma_{1},S)\rightarrow v_{1},\Sigma_{2}
-\end{array}}{[\mbox{var }\left\langle \Gamma_{1},\_,e_{1}\right\rangle ],\Sigma\overset{C}{\rightarrow}v_{1}}\textsc{ (CVar)}
+\Sigma_{1}=(\Gamma,S)\\
+p\,\mbox{fresh}\\
+\Sigma_{2}=(\Gamma[x'\leftarrow p],S[p\leftarrow f])
+\end{array}}{[\mbox{var }x'\, f],\Sigma_{1}\overset{C}{\rightarrow}x'(\_),\Sigma_{2}}\textsc{ (CVar)}
 \]
 }{\footnotesize \par}
 
 {\footnotesize{}
 \[
-\frac{a_{1},\Sigma\overset{C}{\rightarrow}e_{1}\,\,\,\,\,\,\,\,\,\, a_{2},\Sigma\overset{C}{\rightarrow}e_{2}}{[\mbox{op\,\ensuremath{a_{1}}\ensuremath{\, a_{2}}}],\Sigma\overset{C}{\rightarrow}e_{1}\mbox{ op }e_{2}}\textsc{ (COp)}
+\frac{a_{1},\Sigma_{1}\overset{C}{\rightarrow}e_{1},\Sigma_{2}\,\,\,\,\,\,\,\, a_{2},\Sigma_{2}\overset{C}{\rightarrow}e_{2},\Sigma_{3}}{[\mbox{op\,\ensuremath{a_{1}}\ensuremath{\, a_{2}}}],\Sigma_{1}\overset{C}{\rightarrow}e_{1}\mbox{ op }e_{2},\Sigma_{3}}\textsc{ (COp)}
 \]
 }{\footnotesize \par}
 
 {\footnotesize{}
 \[
-\frac{a,\Sigma\overset{C}{\rightarrow}e}{[\mbox{fn }x\, a],\Sigma\overset{C}{\rightarrow}\left\langle \Gamma,x,e\right\rangle }\textsc{ (CFn)}
+\frac{\begin{array}[t]{c}
+\Sigma_{1}=(\Gamma_{1},S_{1})\\
+a,\Sigma_{1}\overset{C}{\rightarrow}e,(\Gamma_{2},S_{2})
+\end{array}}{[\mbox{fn }x\, a],\Sigma_{1}\overset{C}{\rightarrow}\left\langle \Gamma_{2},x,e\right\rangle ,(\Gamma_{1},S_{2})}\textsc{ (CFn)}
 \]
 }%
 \end{minipage}{\footnotesize \par}
 
-\protect\caption{Rules $\rightarrow$ for the evaluation of Lua expressions, $\protect\overset{D}{\rightarrow}$
+\protect\caption{\label{fig:Semantics}Rules $\protect\overset{L}{\rightarrow}$ for
+the evaluation of Lua expressions, $\protect\overset{D}{\rightarrow}$
 for decompiling Lua expressions into ASTs, and $\protect\overset{C}{\rightarrow}$
 for compiling ASTs back into expressions.}
 \end{figure}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-We specify below the behavior of toAST() and compile() by using the
-formalization of a subset of Lua semantics, as presented (as Lua Core)
-in \cite{DeVito2013Terra}. This subset depicts the notions of lexical scoping,
-closures and side-effects and is therefore sufficient for our purposes.
-We extend the Lua Core specification from \cite{DeVito2013Terra} with a general
-``binary operator'' expression, mimicking Lua operators supported
-by LuaToAST.
-
-Lua Core syntax is presented as follows:
-
-\[
-e=b\,|\, x\,|\,\mbox{let \ensuremath{x=e}\,\ in\,\ensuremath{e}}\,|\, x\coloneqq e\,|\, e(e)\,|\,\mbox{fun}(x)\{e\}\,|\, e\mbox{ op }e\,|\,\mbox{toAST}(e)\,|\,\mbox{compile}(a)
-\]
 
 
-Lua expressions can be base values ($b$), variables ($x$), a scoped
-variable definition ($\mbox{let \ensuremath{x=e}\,\ in\,\ensuremath{e}}$,
+The syntax of our version of Lua Core is presented in Figure \ref{fig:LuaCoreSyntax}.
+Lua expressions ($e$) can be base values ($b$), variables ($x$),
+a scoped variable definition ($\mbox{let \ensuremath{x=e}\,\ in\,\ensuremath{e}}$,
 with $e;e$ as sugar for $\mbox{let \ensuremath{\_=e}\,\ in\,\ensuremath{e}}$),
 a variable assignment ($x\coloneqq e$), an application ($e(e)$),
 a function definition ($\mbox{fun}(x)\{e\}$) or an operation on expressions
 ($e\mbox{ op }e$, with semantics defined by a function $Op$). We
-extend this by adding operations toAST($e$) and compile($a$).
+extend this by adding operations \emph{toAST($e$)} and \emph{compile($a$)}.
+Lua values ($v$) can be base values ($b$), closures ($\left\langle \Gamma,x,e\right\rangle $)
+or Lua ASTs ($a$). A Lua AST for a function consists of a root node
+($[\mbox{fn\,\ensuremath{x}\,\ensuremath{a}}]$) which may contain
+nodes that wrap base values\emph{ }($[\mbox{base }b]$\emph{), }variables
+($[\mbox{var }x\,\left\langle \Gamma,x,e\right\rangle ]$) and operations
+($[\mbox{op}\, a\, a]$).
 
-\[
-v=b\,|\,\left\langle \Gamma,x,e\right\rangle \,|\, a
-\]
+In Figure \ref{fig:Semantics}, we present the rules for evaluating
+Lua Core over an environment $\Sigma$, which is a tuple $(\Gamma,S)$
+containing a namespace $\Gamma:x\rightarrow p$ and a store $S:p\rightarrow v$
+(where $p$ are memory positions). We use $\overset{L}{\rightarrow}$
+for the evaluation of Lua expressions as in \cite{DeVito2013Terra};
+where rules have the same names, they have the same semantics as those
+presented in that work. We added rules \textsc{LOp} for the binary
+operation, \textsc{LAst} for the $toAST()$ function and \textsc{LComp}
+for the \emph{compile}() function.
 
+We also add two other relations: rules for decompiling a Lua function
+into an AST ($\overset{D}{\rightarrow}:(e\times\Sigma)\rightarrow a$)
+and rules for compiling ASTs back into Lua functions ($\overset{C}{\rightarrow}:(a\times\Sigma)\rightarrow(e\times\Sigma)$).
+In our formalization, decompiling the function produces an AST but
+does not affect the environment; all values produced are stored in
+the AST itself. Compiling returns an environment with an unmodified
+namespace and a modified store which includes the required closures. 
 
-Lua values can be base values ($b$), closures ($\left\langle \Gamma,x,e\right\rangle $)
-or Lua ASTs ($a$).
+Note that $\overset{D}{\rightarrow}$ is defined only for variables
+(\textsc{DVar}), base values (\textsc{DBase}), the binary operator
+(\textsc{DOp}), and the initial function (\textsc{DFn}), mirroring
+the implementation of \emph{toAST}() in LuaToAST. Its rules deconstruct
+the body of the function and build the corresponding AST. Of particular
+interest is rule \textsc{DVar}, which stores in the AST node a fresh
+variable $x'$ (i.e. one guaranteed not to exist in $\Gamma$) and
+a newly created closure, which returns the value of $x$ given the
+original function's environment. In the complementary rule \textsc{CVar},
+this new variable $x'$ is assigned in the resulting environment to
+hold the node's closure $f$. Note in rule \textsc{CFn} that the derived
+namespace $\Gamma_{2}$ is used only in the resulting closure, whereas
+the derived store $S_{2}$ is used in the resulting environment. In
+$\Gamma_{2}$, all variable references that existed in the original
+function that was decompiled and now recompiled were replaced by calls
+to newly-created closures that merely return the value of the corresponding
+variables.
 
-\[
-a=[\mbox{fn\,\ensuremath{x}\,\ensuremath{a}}]\,|\,[\mbox{base \ensuremath{b}}]\,|\,[\mbox{var }\left\langle \Gamma,x,e\right\rangle ]\,|\,[\mbox{op\,\ensuremath{a}\,\ensuremath{a}}]
-\]
-
-
-A Lua AST for a function consists of a root node ($[\mbox{fn\,\ensuremath{x}\,\ensuremath{a}}]$)
-which may contain nodes that wrap base values\emph{ }($[\mbox{base }b]$\emph{),
-}variables ($[\mbox{var }\left\langle \Gamma,x,e\right\rangle ]$)
-and operations ($[\mbox{op}\, a\, a]$).
-
-The rules for evaluating Lua expressions over an environment $\Sigma$,
-which is a tuple $(\Gamma,S)$ containing a namespace $\Gamma:x\rightarrow p$
-and a store $S:p\rightarrow v$ (where $p$ are memory positions)
-are as follows. We use $\rightarrow$ instead of $\overset{L}{\rightarrow}$
-as in \cite{DeVito2013Terra}; where rules have the same names, they have the
-same semantics as those presented in that work.
+These closures use the original namespace from decompilation time
+($\Gamma$ in \textsc{DVar}), so the variable references are bound
+to the addresses they have in the lexical scope where decompilation
+takes place. Any variable $x$ stored in an AST will only be evaluated
+when the compiled function returned by $compile(a)$ is called, and
+the call to wrapper closure $x'()$ will ensure that $x$ is tied
+to its original namespace.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusions}
