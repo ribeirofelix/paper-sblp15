@@ -65,31 +65,31 @@ Typically, this means that programmers often need to transfer data between
 different languages.
 To overcome this problem, several programming languages created different
 approaches to execute code from a different programming language.
-As an example, LINQ (Language Integrated-Query) is a set of resources that
+As an example, LINQ (Language Integrated-Query) \cite{linq} is a set of resources that
 extends C\#, allowing programmers to perform queries and manipulate data over
 different kinds of data storage such as XML and MDF.
 We can also use LINQ with data structures such as lists and arrays.
 
 Several LINQ methods use lambda expressions to allow programmers to manipulate
 a data collection.
-For instance, consider a list of objects of the class \texttt{PL} that contains
+For instance, consider a list of objects of a class \texttt{PL} that contains
 two attributes: \texttt{name} and \texttt{author}.
 We can use the following C\# code to query this list to obtain a list of programming
 languages where the field \texttt{name} equals to \verb'"Lua"':
 \begin{verbatim}
-    List<PL> result = languages.Where(x => x. name == "Lua");
+    List<PL> result = languages.Where(x => x.name == "Lua");
 \end{verbatim}
 
 The lambda expression in the method \texttt{Where} works like a predicate.
-If the list is a mapping from a relation data base, then LINQ generated SQL
-code to query the data base.
+If the list is a mapping from a relational database, then LINQ generates SQL
+code to query this database.
 In the previous example, C\# first interprets the lambda expression and then
 LINQ generates SQL code.
 
-A lambda expression is an anonymous function in C\#.
-However, C\# has a special name for lambda expressions: \texttt{delegate},
-that is, a reference type to encapsulate an anonymous function.
-They are similar to function pointers in C.
+A lambda expression is an anonymous function in C\#,
+and we can also use the reserved word \texttt{delegate} to create
+reference types that encapsulate an anonymous function.
+This mechanism is similar to function pointers in C.
 Let us see an example:
 \begin{verbatim}
     class Program {
@@ -112,23 +112,25 @@ Functions are opaque, that is, they are types that we cannot manipulate them
 like we can do with lists and objects.
 We cannot explore the contents of a function to know and use the parts that
 compose this function.
-Since we cannot perform other action over a function besides calling it,
+Since we cannot perform other actions over a function besides calling it,
 this data structure is not enough for code generation.
 
 Even though the regular semantics of a lambda expression is to create an
 anonymous function, in C\# lambda expressions can also also create ASTs
 (Abstract Syntax Trees).
 To do that, we can use the type \texttt{Expression <D>} to declare a
-lambda expression that should create an AST instead of an anonymous function.
+lambda expression that should create an AST, instead of creating an
+anonymous function.
 In C\#, the AST of a lambda expression is called \emph{expression tree}.
 
 We want to work with code translation through meta-programming, so
 we need to manipulate functions.
 Some programming languages provide constructions that allow programmers
 to manipulate functions in that way.
-For instance, Lisp introduces the operator \texttt{'} to be used before an expression.
+For instance, Lisp \cite{McCarthy1960RFS} introduces the operator \texttt{'}
+to be used before an expression.
 When the compiler finds this operator, it does not evaluate the expression,
-but it creates an AST for the expression.
+but it creates an AST for that expression.
 
 Several programming languages do not have native support for this feature.
 However, there are some solutions that allow meta-programming in these languages.
@@ -149,6 +151,7 @@ builds the AST of a lambda expression:
       }
     }
 \end{verbatim}
+
 In this example, \texttt{treeTwice} is an object of the class \texttt{Expression}.
 This object describes the AST for the function \texttt{x => x + x} with all the
 necessary information to compile or interpret this function.
@@ -185,15 +188,14 @@ In this example, the result of this sum is \texttt{42} because the lambda expres
 uses the variable \texttt{y} that is in the scope of \texttt{boo}, instead of
 the using the variable \texttt{y} that is in the scope of \texttt{foo}.
 
-This example shows that an AST that describes a lambda expression that uses
-variables from an external local scope needs the information about the context
-where this expression was defined.
+When an AST describes a lambda expression that uses variables from an
+external local scope, this AST needs the information about the context
+where the expression was defined.
 When an AST stores more information than the syntax of the written code,
 we say that this AST is an annotated AST.
-
-When a list has as its source a relational data base, LINQ uses this mechanism
-to during compile-time create an AST that translates the code to SQL.
-When this lambda expression is sent to a variable that was declared as
+For instance, LINQ uses this mechanism during compile-time to create an
+AST that translates the code to SQL.
+When a lambda expression is sent to a variable that was declared as
 \texttt{Expression <D>}, LINQ uses this object to translate to SQL.
 
 We propose an approach in which the embedded code shares variables with the
@@ -222,8 +224,8 @@ Lambda functions is defined here as functions that only contains the return stat
 The expression contained in the return statement can be of any kind and can also use variables of the outer lexical scope.
 In Lua, this kind of variables are called upvalues.
 The process of generation uses externs libraries: luadec and lua-parser.
-Luadec\cite{TODO} is a Lua decompiler that takes a Lua binary chunk and returns a string with equivalent code.
-Lua-parser\cite{TODO} generates a Lua AST from a string with a valid Lua code.
+Luadec \cite{LuaDec} is a Lua decompiler that takes a Lua binary chunk and returns a string with equivalent code.
+Lua-parser \cite{lua-parser} generates a Lua AST from a string with a valid Lua code.
 
 %% TODO : detalhar o pq do uso do luadec - diferenciar dos related works
 %% explicitando as vantagens de utilizar o LuaDec
