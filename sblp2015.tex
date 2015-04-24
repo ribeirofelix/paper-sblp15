@@ -549,10 +549,56 @@ the call to wrapper closure $x'()$ will ensure that $x$ is tied
 to its original namespace.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Conclusions}
+\section{Conclusion}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% TODO
+In this work we presented an approach for multi-stage programming through
+which the lexical scope of variables can be preserved, by replacing
+variable references in the generated representation of the embedded language
+with closures from the host language. When the intermediate representation
+is later converted into executable form, calls to these closures are
+produced, ensuring access to the variable in the correct context.
+
+We implemented a module that demonstrates this approach.
+Our implementation uses a decompiler to convert, at runtime, Lua
+functions into an abstract syntax tree form decorated with
+closures that capture the lexical environment of free variables.
+The module is then able to compile the AST back into Lua,
+ensuring that the resulting function accesses the correct variables
+even if compiled at a different call site.
+
+The technique we present here is general, and its core principle
+is not dependent on decompilation or on specificities of Lua.
+It could be implemented in other languages using other methods,
+such as source code pre-processing. However, the dynamic manipulation
+of function objects, as opposed to compile-time manipulation of the
+source tree, allows us to perform multi-stage programming dynamically,
+operating on any suitable functions, even if they were created at run-time.
+This is particularly useful for dynamic languages which provide
+\texttt{eval}-like functionality, as is the case of Lua, with
+the \texttt{dostring()} function of its standard library.
+
+Our implementation also exploited Lua's facilities for manipulating
+a closure's symbol table, which allowed the construction of the
+generated functions purely through manipulation of Lua function
+objects, without having to resort to low-level bytecode generation.
+The only bytecode-level manipulation performed by LuaToAST is
+read-only, and is restricted to the decompiler module. The
+implementation did not require any modifications to the Lua VM.
+
+We also specified the operational semantics for the transformations
+performed by LuaToAST, in order to show how the lexical environment
+of variables is correctly preserved, and to properly contrast it with
+related work from the literature on multi-stage programming.
+
+This work presents many possibilities for future extensions. The current
+implementation is a proof-of-concept that demonstrates the technique,
+and can be extended to support a wider range of Lua functions, by
+supporting more of the host language's grammar. Another future work
+we envision is the development of different code-generation back-ends,
+supporting other languages. This would allow, for example, using
+Lua functions for writing prepared statements for database query
+languages.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
