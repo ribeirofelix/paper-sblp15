@@ -53,60 +53,55 @@ Embedded Languages
 \section{Introduction}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Programmers often need to manipulate collections of several different data types
-when they are developing applications.
-For instance, they need to define searches on a certain data, filter data according
-to a condition, project fields from a data structure, fold some amount of data,
-and join two different data sets.
-In relational databases, we can use SQL to perform these tasks.
-However, these tasks usually require the context of a data structure to be executed.
+Programmers often need to embed source code from one language into a
+different language.
+For instance, combining relational query languages with application
+language allows programmers to manipulate collections of several
+different data types when they are developing applications.
 
-Typically, this means that programmers often need to transfer data between
-different languages.
+Combining different languagens should allow programmers to transfer data
+between these languages, a task that usually require a data context to
+be executed.
 To overcome this problem, several programming languages created different
 approaches to execute code from a different programming language.
-As an example, LINQ (Language Integrated-Query) \cite{linq} is a set of resources that
-extends C\#, allowing programmers to perform queries and manipulate data over
-different kinds of data storage such as XML and MDF.
-We can also use LINQ with data structures such as lists and arrays.
 
-Several LINQ methods use lambda expressions to allow programmers to manipulate
-a data collection.
-For instance, consider a list of objects of a class \texttt{PL} that contains
-two attributes: \texttt{name} and \texttt{author}.
-We can use the following C\# code to query this list to obtain a list of programming
-languages where the field \texttt{name} equals to \verb'"Lua"':
-\begin{verbatim}
-    List<PL> result = languages.Where(x => x.name == "Lua");
-\end{verbatim}
+%Several LINQ methods use lambda expressions to allow programmers to manipulate
+%a data collection.
+%For instance, consider a list of objects of a class \texttt{PL} that contains
+%two attributes: \texttt{name} and \texttt{author}.
+%We can use the following C\# code to query this list to obtain a list of programming
+%languages where the field \texttt{name} equals to \verb'"Lua"':
+%\begin{verbatim}
+%    List<PL> result = languages.Where(x => x.name == "Lua");
+%\end{verbatim}
 
-The lambda expression in the method \texttt{Where} works like a predicate.
-If the list is a mapping from a relational database, then LINQ generates SQL
-code to query this database.
-In the previous example, C\# first interprets the lambda expression and then
-LINQ generates SQL code.
+%The lambda expression in the method \texttt{Where} works like a predicate.
+%If the list is a mapping from a relational database, then LINQ generates SQL
+%code to query this database.
+%In the previous example, C\# first interprets the lambda expression and then
+%LINQ generates SQL code.
 
-A lambda expression is an anonymous function in C\#,
-and we can also use the reserved word \texttt{delegate} to create
-reference types that encapsulate an anonymous function.
-This mechanism is similar to function pointers in C.
-Let us see an example:
-\begin{verbatim}
-    class Program {
-      delegate int Twice (int arg);
-      void foo () {
-        Twice del = x => x + x;
-        int res = del(3);
-      }
-    }
-\end{verbatim}
+%A lambda expression is an anonymous function in C\#,
+%and we can also use the reserved word \texttt{delegate} to create
+%reference types that encapsulate an anonymous function.
+%This mechanism is similar to function pointers in C.
+%Let us see an example:
+%\begin{verbatim}
+%    class Program {
+%      delegate int Twice (int arg);
+%      void foo () {
+%        Twice del = x => x + x;
+%        int res = del(3);
+%      }
+%    }
+%\end{verbatim}
 
-In this example, we use the directive \texttt{delegate} to define the type \texttt{Twice}.
-Inside the function \texttt{foo}, we declare \texttt{del} with type \texttt{Twice}
-and assign to \texttt{del} a lambda expression.
-This lambda expression just returns the sum of its only argument.
-The type \texttt{Twice} is a function type, so the only operation that we can
-perform over objects of this type is to call them.
+%In this example, we use the directive \texttt{delegate} to define the type \texttt{Twice}.
+%Inside the function \texttt{foo}, we declare \texttt{del} with type \texttt{Twice}
+%and assign to \texttt{del} a lambda expression.
+%This lambda expression just returns the sum of its only argument.
+%The type \texttt{Twice} is a function type, so the only operation that we can
+%perform over objects of this type is to call them.
 
 Functions are opaque, that is, they are types that we cannot manipulate them
 like we can do with lists and objects.
@@ -115,13 +110,13 @@ compose this function.
 Since we cannot perform other actions over a function besides calling it,
 this data structure is not enough for code generation.
 
-Even though the regular semantics of a lambda expression is to create an
-anonymous function, in C\# lambda expressions can also also create ASTs
-(Abstract Syntax Trees).
-To do that, we can use the type \texttt{Expression <D>} to declare a
-lambda expression that should create an AST, instead of creating an
-anonymous function.
-In C\#, the AST of a lambda expression is called \emph{expression tree}.
+%Even though the regular semantics of a lambda expression is to create an
+%anonymous function, in C\# lambda expressions can also also create ASTs
+%(Abstract Syntax Trees).
+%To do that, we can use the type \texttt{Expression <D>} to declare a
+%lambda expression that should create an AST, instead of creating an
+%anonymous function.
+%In C\#, the AST of a lambda expression is called \emph{expression tree}.
 
 We want to work with code translation through meta-programming, so
 we need to manipulate functions.
@@ -140,70 +135,74 @@ code that is inside a string.
 However, solutions like this have some inconveniences.
 For instance, it is hard to detect syntactical errors while compiling the code.
 
-In C\#, we can use the method \texttt{Compile} to create a function that
-builds the AST of a lambda expression:
-\begin{verbatim}
-    class Program {
-      delegate int Twice (int arg);
-      void foo () {
-        Expression <Twice> treeTwice = x => x + x;
-        int res = treeTwice.Compile()(3);
-      }
-    }
-\end{verbatim}
+%In C\#, we can use the method \texttt{Compile} to create a function that
+%builds the AST of a lambda expression:
+%\begin{verbatim}
+%    class Program {
+%      delegate int Twice (int arg);
+%      void foo () {
+%        Expression <Twice> treeTwice = x => x + x;
+%        int res = treeTwice.Compile()(3);
+%      }
+%    }
+%\end{verbatim}
 
-In this example, \texttt{treeTwice} is an object of the class \texttt{Expression}.
-This object describes the AST for the function \texttt{x => x + x} with all the
-necessary information to compile or interpret this function.
+%In this example, \texttt{treeTwice} is an object of the class \texttt{Expression}.
+%This object describes the AST for the function \texttt{x => x + x} with all the
+%necessary information to compile or interpret this function.
 
-Lambda expressions can access external local variables.
-In C\#, it does not matter if a lambda expression was used to create an
-\emph{expression tree} or a function, but the variable that was used at
-the moment of the definition of the lambda expression is always referenced
-independently of the context that it is used, working like a \emph{closure}.
-Let us see an example:
-\begin{verbatim}
-    class Program {
-      delegate int sumY (int arg);
-      Expression <sumY> boo () {
-        int y = 1;
-        Expression <sumY> treesumY = x => x + y;
-        return treesumY;
-      }
-      void foo () {
-        int y = 10;
-        Expression <sumY> ret = boo();
-        int res = ret.Compile()(41); 
-      }
-    }
-\end{verbatim}
+%Lambda expressions can access external local variables.
+%In C\#, it does not matter if a lambda expression was used to create an
+%\emph{expression tree} or a function, but the variable that was used at
+%the moment of the definition of the lambda expression is always referenced
+%independently of the context that it is used, working like a \emph{closure}.
+%Let us see an example:
+%\begin{verbatim}
+%    class Program {
+%      delegate int sumY (int arg);
+%      Expression <sumY> boo () {
+%        int y = 1;
+%        Expression <sumY> treesumY = x => x + y;
+%        return treesumY;
+%      }
+%      void foo () {
+%        int y = 10;
+%        Expression <sumY> ret = boo();
+%        int res = ret.Compile()(41); 
+%      }
+%    }
+%\end{verbatim}
 
-In this example, \texttt{boo} returns a value of type \texttt{Expression <sumY>},
-which is a function that gets one parameter and sums \texttt{y} to this parameter.
-The function \texttt{boo} uses the variable \texttt{y} that was declared inside
-its definition.
-This means that \texttt{ret.Compile()(41)} generates a function that returns
-the result of \texttt{x + y} when we call this function.
-In this example, the result of this sum is \texttt{42} because the lambda expression
-uses the variable \texttt{y} that is in the scope of \texttt{boo}, instead of
-the using the variable \texttt{y} that is in the scope of \texttt{foo}.
+%In this example, \texttt{boo} returns a value of type \texttt{Expression <sumY>},
+%which is a function that gets one parameter and sums \texttt{y} to this parameter.
+%The function \texttt{boo} uses the variable \texttt{y} that was declared inside
+%its definition.
+%This means that \texttt{ret.Compile()(41)} generates a function that returns
+%the result of \texttt{x + y} when we call this function.
+%In this example, the result of this sum is \texttt{42} because the lambda expression
+%uses the variable \texttt{y} that is in the scope of \texttt{boo}, instead of
+%the using the variable \texttt{y} that is in the scope of \texttt{foo}.
 
 When an AST describes a lambda expression that uses variables from an
 external local scope, this AST needs the information about the context
 where the expression was defined.
 When an AST stores more information than the syntax of the written code,
 we say that this AST is an annotated AST.
-For instance, LINQ uses this mechanism during compile-time to create an
-AST that translates the code to SQL.
-When a lambda expression is sent to a variable that was declared as
-\texttt{Expression <D>}, LINQ uses this object to translate to SQL.
+%For instance, LINQ uses this mechanism during compile-time to create an
+%AST that translates the code to SQL.
+%When a lambda expression is sent to a variable that was declared as
+%\texttt{Expression <D>}, LINQ uses this object to translate to SQL.
 
 We propose an approach in which the embedded code shares variables with the
 host language, preserving lexical scoping rules even after the code is
-converted into an intermediate representation. We demonstrate this approach
-through a module for meta-programming using Lua as both embedded and host
+converted into an intermediate representation.
+
+We demonstrate this approach
+through a module for metaprogramming using Lua as both embedded and host
 languages, which decompiles Lua functions to their AST form and can later
-rebuild them preserving scoping rules of the decompilation site. Our method
+rebuild them preserving scoping rules of the decompilation site.
+
+Our method
 requires no special annotation of functions to be translated and is
 implemented as a library, requiring no source pre-processing or changes to
 the host language execution environment.
@@ -212,7 +211,20 @@ the host language execution environment.
 \section{Related Work}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% TODO
+LINQ (Language Integrated-Query) \cite{linq} is a set of resources that
+extends C\#, allowing programmers to perform queries and manipulate data over
+different kinds of data storage such as XML and MDF.
+We can also use LINQ with data structures such as lists and arrays.
+
+\cite{Calcagno2003implementing}
+
+\cite{Taha2004gentle,Taha2008gentle}
+
+\cite{Taha2000MetaML}
+
+\cite{Taha1999MSP}
+
+\cite{Westbrook2010Mint}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Lua2AST}
