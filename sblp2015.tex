@@ -52,81 +52,27 @@ Embedded Languages
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\label{sec:introduction}
 
-Programmers often need to embed source code from one language into a
-different language.
-For instance, combining relational query languages with application
-language allows programmers to manipulate collections of several
-different data types when they are developing applications.
+Domain Specific Languages (DSLs) are a way to simplify the development
+of programs through the agregation of a specific knowledge into an
+specific programming language.
+A Domain Specific Language (DSL) is a concise programming language that
+has a specific syntax to better express the semantics of a specific domain. 
+For instance, we can use LaTeX for text processing, MATLAB for performing
+numerical computations, and SQL for querying relational databases.
 
-Combining different languagens should allow programmers to transfer data
-between these languages, a task that usually require a data context to
-be executed.
-To overcome this problem, several programming languages created different
-approaches to execute code from a different programming language.
+Sometimes programmers need to embed source code from one language into
+a different language, and embeding a DSL into an application language
+is a way to handle this problem.
+For instance, we can combine relational query language with application
+language to allow programmers to manipulate collections of several
+different data types when they are developing applications that
+access relational databases.
 
-%Several LINQ methods use lambda expressions to allow programmers to manipulate
-%a data collection.
-%For instance, consider a list of objects of a class \texttt{PL} that contains
-%two attributes: \texttt{name} and \texttt{author}.
-%We can use the following C\# code to query this list to obtain a list of programming
-%languages where the field \texttt{name} equals to \verb'"Lua"':
-%\begin{verbatim}
-%    List<PL> result = languages.Where(x => x.name == "Lua");
-%\end{verbatim}
-
-%The lambda expression in the method \texttt{Where} works like a predicate.
-%If the list is a mapping from a relational database, then LINQ generates SQL
-%code to query this database.
-%In the previous example, C\# first interprets the lambda expression and then
-%LINQ generates SQL code.
-
-%A lambda expression is an anonymous function in C\#,
-%and we can also use the reserved word \texttt{delegate} to create
-%reference types that encapsulate an anonymous function.
-%This mechanism is similar to function pointers in C.
-%Let us see an example:
-%\begin{verbatim}
-%    class Program {
-%      delegate int Twice (int arg);
-%      void foo () {
-%        Twice del = x => x + x;
-%        int res = del(3);
-%      }
-%    }
-%\end{verbatim}
-
-%In this example, we use the directive \texttt{delegate} to define the type \texttt{Twice}.
-%Inside the function \texttt{foo}, we declare \texttt{del} with type \texttt{Twice}
-%and assign to \texttt{del} a lambda expression.
-%This lambda expression just returns the sum of its only argument.
-%The type \texttt{Twice} is a function type, so the only operation that we can
-%perform over objects of this type is to call them.
-
-Functions are opaque, that is, they are types that we cannot manipulate them
-like we can do with lists and objects.
-We cannot explore the contents of a function to know and use the parts that
-compose this function.
-Since we cannot perform other actions over a function besides calling it,
-this data structure is not enough for code generation.
-
-%Even though the regular semantics of a lambda expression is to create an
-%anonymous function, in C\# lambda expressions can also also create ASTs
-%(Abstract Syntax Trees).
-%To do that, we can use the type \texttt{Expression <D>} to declare a
-%lambda expression that should create an AST, instead of creating an
-%anonymous function.
-%In C\#, the AST of a lambda expression is called \emph{expression tree}.
-
-We want to work with code translation through meta-programming, so
-we need to manipulate functions.
-Some programming languages provide constructions that allow programmers
-to manipulate functions in that way.
-For instance, Lisp \cite{McCarthy1960RFS} introduces the operator \texttt{'}
-to be used before an expression.
-When the compiler finds this operator, it does not evaluate the expression,
-but it creates an AST for that expression.
-
+Embedding a DSL into an application language should allow programmers
+to transfer data between these languages, a task that usually require
+a data context to be executed.
 Several programming languages do not have native support for this feature.
 However, there are some solutions that allow meta-programming in these languages.
 For instance, in Lua it is common to write code that we want to manipulate
@@ -135,81 +81,67 @@ code that is inside a string.
 However, solutions like this have some inconveniences.
 For instance, it is hard to detect syntactical errors while compiling the code.
 
-%In C\#, we can use the method \texttt{Compile} to create a function that
-%builds the AST of a lambda expression:
-%\begin{verbatim}
-%    class Program {
-%      delegate int Twice (int arg);
-%      void foo () {
-%        Expression <Twice> treeTwice = x => x + x;
-%        int res = treeTwice.Compile()(3);
-%      }
-%    }
-%\end{verbatim}
+Multi-Stage Programming (MSP) \cite{Taha1999MSP,Taha2004gentle,Taha2008gentle}
+is a meta-programming approach that help embeding a programming language in
+a host language with support to lexical scoping.
+MSP handles embeded code through some language constructs that perform
+program generation inside the host language.
+One benefit of MSP is that it does not delay error verifications to run-time.
+For instance, we can detect syntactical errors in the embeded code
+during compile-time.
+In fact, MSP is designed to detect type errors in the embeded code
+during compile-time, preventing them to appear after the code is deployed.
+Another benefit of MSP is that we can use program specialization to
+reduce the costs of abstractions \cite{Taha1999MSP}.
 
-%In this example, \texttt{treeTwice} is an object of the class \texttt{Expression}.
-%This object describes the AST for the function \texttt{x => x + x} with all the
-%necessary information to compile or interpret this function.
-
-%Lambda expressions can access external local variables.
-%In C\#, it does not matter if a lambda expression was used to create an
-%\emph{expression tree} or a function, but the variable that was used at
-%the moment of the definition of the lambda expression is always referenced
-%independently of the context that it is used, working like a \emph{closure}.
-%Let us see an example:
-%\begin{verbatim}
-%    class Program {
-%      delegate int sumY (int arg);
-%      Expression <sumY> boo () {
-%        int y = 1;
-%        Expression <sumY> treesumY = x => x + y;
-%        return treesumY;
-%      }
-%      void foo () {
-%        int y = 10;
-%        Expression <sumY> ret = boo();
-%        int res = ret.Compile()(41); 
-%      }
-%    }
-%\end{verbatim}
-
-%In this example, \texttt{boo} returns a value of type \texttt{Expression <sumY>},
-%which is a function that gets one parameter and sums \texttt{y} to this parameter.
-%The function \texttt{boo} uses the variable \texttt{y} that was declared inside
-%its definition.
-%This means that \texttt{ret.Compile()(41)} generates a function that returns
-%the result of \texttt{x + y} when we call this function.
-%In this example, the result of this sum is \texttt{42} because the lambda expression
-%uses the variable \texttt{y} that is in the scope of \texttt{boo}, instead of
-%the using the variable \texttt{y} that is in the scope of \texttt{foo}.
-
-When an AST describes a lambda expression that uses variables from an
-external local scope, this AST needs the information about the context
-where the expression was defined.
-When an AST stores more information than the syntax of the written code,
-we say that this AST is an annotated AST.
-%For instance, LINQ uses this mechanism during compile-time to create an
-%AST that translates the code to SQL.
-%When a lambda expression is sent to a variable that was declared as
-%\texttt{Expression <D>}, LINQ uses this object to translate to SQL.
+Using MSP to embed languages inside imperative languages can be hard,
+because in these languages programmers can use free variables outside
+of the scope of their declarations \cite{Westbrook2010Mint}.
+In purely functional languages we do not have this problem because these
+languages do not have side effects \cite{Kameyama2008CSS}.
 
 We propose an approach in which the embedded code shares variables with the
 host language, preserving lexical scoping rules even after the code is
 converted into an intermediate representation.
+Our approach is an extension to MSP where the host language uses closures
+to share data with the embeded language through variable references in
+the generated code.
+This means that our approach uses closures to ensure that free variables
+are not used outside of the scope of their declarations.
 
-We demonstrate this approach
-through a module for metaprogramming using Lua as both embedded and host
-languages, which decompiles Lua functions to their AST form and can later
-rebuild them preserving scoping rules of the decompilation site.
+We demonstrate this approach through a module for meta-programming using Lua
+as both embedded and host languages.
+Our module decompiles Lua functions to their Abstract Syntax Tree (AST) form
+and can later rebuild them preserving scoping rules of the decompilation site.
+For simplicity, our approach supports functions that only contain a
+\texttt{return} statement.
+We call these functions \emph{lambda functions}.
 
-Our method
-requires no special annotation of functions to be translated and is
+Our method requires no special annotation of functions to be translated and is
 implemented as a library, requiring no source pre-processing or changes to
 the host language execution environment.
+When an AST describes a \emph{lambda function} that uses variables from an
+external local scope, this AST includes the information about the context
+where this \emph{lambda function} was defined.
+When an AST stores more information than the syntax of the written code,
+we say that this AST is an annotated AST.
+
+We organize this paper in five sections.
+In Section \ref{sec:related} we review related work in the field
+of multi-stage programming.
+In Section \ref{sec:lua2ast} we demonstrate our approach.
+In Section \ref{sec:semantics} we formalize the semantics of our approach.
+In Section \ref{sec:conclusion} we present our conclusions.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Related Work}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\label{sec:related}
+
+Lisp \cite{McCarthy1960RFS} introduces the operator \texttt{'}
+to be used before an expression.
+When the compiler finds this operator, it does not evaluate the expression,
+but it creates an AST for that expression.
 
 LINQ (Language Integrated-Query) \cite{linq} is a set of resources that
 extends C\#, allowing programmers to perform queries and manipulate data over
@@ -226,10 +158,23 @@ We can also use LINQ with data structures such as lists and arrays.
 
 \cite{Westbrook2010Mint}
 
+Metalua \cite{metalua} is a Lua compiler that supports compile-time
+metaprogramming (CTMP), a mechanism that allows programmers to interact
+with the compiler through a macro system \cite{Fleutot2007contrasting}.
+Metalua extends Lua 5.1 to provide methods for transforming Lua
+code into Abstract Syntax Trees (ASTs), but this code cannot contain
+\emph{upvalues}.
+In Lua, \emph{upvalues} are \emph{non-local variables}, that is,
+they are free variables that are not defined in the local scope,
+but they are often defined inside an anonymous function \cite{Ierusalimschy2006PIL}.
+In the next section we will show that our apparoch can generate
+the same AST that Metalua generates, but including information
+about \emph{upvalues}.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Lua2AST}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+\label{sec:lua2ast}
 
 Lua2AST is a Lua module that takes a restricted form of Lua function, that we named lambda functions, and generates its AST in runtime.
 Lambda functions is defined here as functions that only contains the return statement.
@@ -338,6 +283,7 @@ print(f(2)) -- output: 42
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Semantics}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\label{sec:semantics}
 
 \label{sec:semantics}
 
@@ -563,6 +509,7 @@ to its original namespace.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusion}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\label{sec:conclusion}
 
 In this work we presented an approach for multi-stage programming through
 which the lexical scope of variables can be preserved, by replacing
