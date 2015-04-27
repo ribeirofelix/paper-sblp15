@@ -144,6 +144,10 @@ In Section \ref{sec:conclusion} we present our conclusions.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \label{sec:related}
 
+Meta-programming allows programmers to improving code performance
+or code expressiveness, by defining transformations so that the programmer
+can write code in a higher level of abstraction but still produce
+efficient code.
 Lisp \cite{McCarthy1960RFS} pioneered meta-programming by introducing
 a mechanism called \emph{quasi-quotation}
 that is useful for various forms of program generation.
@@ -156,8 +160,6 @@ This feature, however, does not preserve scoping rules.
 Multi-Stage Programming \cite{Taha1999MSP,Taha2004gentle,Taha2008gentle} is
 similar to the quasi-quotation mechanism introduced by Lisp,
 but it takes lexical scoping into account.
-MSP allows programmers to use meta-programming for improving code performance
-or code expressiveness.
 To do that, it introduces three constructs that programmers can use to
 annotate code: \emph{brackets}, \emph{escape}, and \emph{run}.
 We will use MetaOCaml \cite{Calcagno2003implementing}, an OCaml extension
