@@ -197,6 +197,16 @@ The staged interpreter translates the DSL code to the host language code,
 and that is the reason why it can run efficient code \cite{Taha2004gentle}.
 
 Mint \cite{Westbrook2010Mint} is a MSP extension to Java.
+Even though MSP ensures correctness while embedding languages using
+purely functional languages, the same is not that straightforward when
+we try to use MSP for embbeding imperative languages.
+The problem of embedding a language in an imperative language is
+related to side effects, as programmers can use free variables
+undeliberatedly.
+Mint extends the semantics of the escape construct to to impose
+some restrictions on side effects, not allowing side effects to
+appear inside a escape construct when these side effects interact
+with delayed code.
 
 LINQ (Language Integrated-Query) \cite{linq} is a set of resources that
 extends C\#, allowing programmers to perform queries and manipulate data over
@@ -234,11 +244,13 @@ Luadec \cite{luadec} is a Lua decompiler that takes a Lua binary chunk and retur
 
 One big difference from this work to the related works is that we use a decompiler and do not annotate the code.
 Some advantages lie in the use of a decompiler: 
-(1) No modification in virtual machine; 
-(2) More transparent to the programmer; 
-(3) All the process is performed in runtime;
-(4) Lua's eval function can be used.
-As explained in following paragraphs.
+\begin{enumerate}
+\item No modification in virtual machine; 
+\item More transparent to the programmer; 
+\item All the process is performed in runtime;
+\item Lua's eval function can be used.
+\end{enumerate}
+In the following paragraphs we explain these advantages in more detail.
 
 Since a decompiler is used there is no need to modify the Lua's virtual machine source code.
 So, the library takes a runtime binary chunk and uses the decompiler to get an equivalent code.
