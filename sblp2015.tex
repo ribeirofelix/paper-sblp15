@@ -229,8 +229,8 @@ Lambda functions are defined here as functions that only contain the return stat
 The expression contained in the return statement can be of any kind and can also use variables of the outer lexical scope.
 In Lua, this kind of variables are called upvalues.
 The process of generation uses externs libraries: luadec and lua-parser.
-Lua-parser\cite{TODO} generates a Lua AST from a string with a valid Lua code.
-Luadec\cite{TODO} is a Lua decompiler that takes a Lua binary chunk and returns a string with equivalent code.
+Lua-parser \cite{lua-parser} generates a Lua AST from a string with a valid Lua code.
+Luadec \cite{luadec} is a Lua decompiler that takes a Lua binary chunk and returns a string with equivalent code.
 
 One big difference from this work to the related works is that we use a decompiler and do not annotate the code.
 Some advantages lie in the use of a decompiler: 
