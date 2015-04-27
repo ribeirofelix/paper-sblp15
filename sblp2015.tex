@@ -11,7 +11,7 @@
 
 \author{
 Félix Ribeiro,
-Hisham Muhammad,
+Hisham Muhammad,\\
 André Murbach Maidl,
 Roberto Ierusalimschy
 }
@@ -44,7 +44,7 @@ the host language execution environment.
 
 \keywords{
 Lua,
-Domain Specific Languages,
+Domain-Specific Languages,
 Embedded Languages
 }
 \end{abstract}
@@ -54,75 +54,83 @@ Embedded Languages
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \label{sec:introduction}
 
-Domain Specific Languages (DSLs) are a way to simplify the development
-of programs through the aggregation of a specific knowledge into an
-specific programming language.
-A Domain Specific Language (DSL) is a concise programming language that
-has a specific syntax to better express the semantics of a specific domain. 
-For instance, we can use LaTeX for text processing, MATLAB for performing
+Domain-Specific Languages (DSLs) are a way to simplify the development
+of programs through the aggregation of domain knowledge into a
+programming language.
+A Domain-Specific Language is a programming language that
+includes features to express the semantics of a domain,
+often adding specific syntax.
+Examples of DSLs are \TeX{} for text processing, MATLAB for performing
 numerical computations, and SQL for querying relational databases.
 
-Sometimes programmers need to embed source code from one language into
-a different language, and embedding a DSL into an application language
-is a way to handle this problem.
-For instance, we can combine relational query language with application
-language to allow programmers to manipulate collections of several
-different data types when they are developing applications that
-access relational databases.
+The use of DSLs frequently happens in combination with other languages, so
+that some aspects of a problem are handled with the DSL while other parts are
+developed in a general-purpose language \cite{Fowler:2010:DSL:1809745}. One
+way to do this is to embed source code written in the domain-specific language
+into the source code of the application, which is written in another language.
+We have then the notion of a "host language" and an "embedded language". SQL
+is an example of language which is often used in this fashion.
 
-Embedding a DSL into an application language should allow programmers
-to transfer data between these languages, a task that usually require
-a data context to be executed.
-Several programming languages do not have native support for this feature.
-However, there are some solutions that allow meta-programming in these languages.
-For instance, in Lua it is common to write code that we want to manipulate
-inside a string and use functions from the standard library to evaluate this
-code that is inside a string.
-However, solutions like this have some inconveniences.
+Embedding source code of one language into another poses challenges.
+Typically, a language parser does not have support for handling
+chunks of code written in another language intermixed with the source
+code. Common approaches to handle the source code of two languages
+in a single source file are to either pull the processing back to a
+step prior to the parsing of the main language, using pre-processing,
+or to push it forward by storing the code written in the embedded
+language as strings in the host language source code, which are only
+sent to the embedded language for processing at run time.
+
+This approach of storing code as strings, while popular, has some inconveniences.
 For instance, it is hard to detect syntactical errors while compiling the code.
+Embedding languages should also allow programmers to transfer data
+between these languages, preferrably minimizing duplication.
+For these reasons, solutions based on meta-programming where the
+embedded language can be manipulated at a higher level of abstraction
+than strings are more interesting.
 
 Multi-Stage Programming (MSP) \cite{Taha1999MSP,Taha2004gentle,Taha2008gentle}
-is a meta-programming approach that help embedding a programming language in
-a host language with support to lexical scoping.
-MSP handles embedded code through some language constructs that perform
-program generation inside the host language.
-One benefit of MSP is that it does not delay error verifications to run-time.
-For instance, we can detect syntactical errors in the embedded code
+is a meta-programming approach that helps embedding a programming language in
+a host language in a well-organized way.
+It defines constructs for quoting and escaping source code
+that produce code objects, which are valid objects stored in the host
+language but can also be invoked to execute the embedded language.
+A major benefit of MSP is that it does not delay error verification to run-time.
+One can detect syntactical errors and even type errors in the embedded code
 during compile-time.
-In fact, MSP is designed to detect type errors in the embedded code
-during compile-time, preventing them to appear after the code is deployed.
 Another benefit of MSP is that we can use program specialization to
 reduce the costs of abstractions \cite{Taha1999MSP}.
 
 Using MSP to embed languages inside imperative languages can be hard,
-because in these languages programmers can use free variables outside
-of the scope of their declarations \cite{Westbrook2010Mint}.
-In purely functional languages we do not have this problem because these
-languages do not have side effects \cite{Kameyama2008CSS}.
+because in these languages programmers can move code objects so they
+are used outside of the scope of the binder of their free variables
+\cite{Westbrook2010Mint}.
+In purely functional languages we do not have this problem 
+due to the absence of side effects \cite{Kameyama2008CSS}.
 
-We propose an approach in which the embedded code shares variables with the
+In this work, we propose an approach for meta-programming which
+in which the embedded code shares variables with the
 host language, preserving lexical scoping rules even after the code is
 converted into an intermediate representation.
-Our approach is an extension to MSP where the host language uses closures
-to share data with the embedded language through variable references in
-the generated code.
-This means that our approach uses closures to ensure that free variables
-are not used outside of the scope of their declarations.
+In our proposed method, the host language uses closures
+to share data with the embedded language, replacing variable references
+with function calls in the generated code.
+This way, we ensure that free variables always match the scope of their declarations.
 
 We demonstrate this approach through a module for meta-programming using Lua
 as both embedded and host languages.
 Our module decompiles Lua functions to their Abstract Syntax Tree (AST) form
 and can later rebuild them preserving scoping rules of the decompilation site.
-For simplicity, our approach supports functions that only contain a
-\texttt{return} statement.
+For simplicity, our implementation only supports functions that contain a
+a single expression.
 We call these functions \emph{lambda functions}.
 
 Our method requires no special annotation of functions to be translated and is
 implemented as a library, requiring no source pre-processing or changes to
 the host language execution environment.
-When an AST describes a \emph{lambda function} that uses variables from an
+When an AST describes a function that uses variables from an
 external local scope, this AST includes the information about the context
-where this \emph{lambda function} was defined.
+where this function was defined.
 When an AST stores more information than the syntax of the written code,
 we say that this AST is an annotated AST.
 
@@ -138,25 +146,25 @@ In Section \ref{sec:conclusion} we present our conclusions.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \label{sec:related}
 
-Lisp \cite{McCarthy1960RFS} introduces a mechanism called \emph{quasiquotation}
-that is useful for writing macros and some forms of program generation.
-To do that, Lisp introduces the operator \texttt{`} to be used before an expression.
+Lisp \cite{McCarthy1960RFS} pioneered meta-programming by introducing
+a mechanism called \emph{quasi-quotation}
+that is useful for various forms of program generation.
+The language includes the operator \texttt{`} that can be used before an expression.
 When the compiler finds this operator, it does not evaluate the expression,
 but it creates an AST for that expression \cite{Bawden1999quasiquotation}.
-The disadvantage of this approach is that is does not preserve lexical scoping.
+This feature, however, does not preserve scoping rules.
 
 Multi-Stage Programming \cite{Taha1999MSP,Taha2004gentle,Taha2008gentle} is
-similar to the \emph{quasiquotation} mechanism introduced by Lisp,
+similar to the quasi-quotation mechanism introduced by Lisp,
 but it takes lexical scoping into account.
 MSP allows programmers to use meta-programming for improving code performance
 or code expressiveness.
-To do that, MSP introduces three constructs that programmers can use to
-annotate code: brackets, escape, and run.
-We will use MetaOCaml \cite{Calcagno2003implementing} to briefly explain
+To do that, it introduces three constructs that programmers can use to
+annotate code: \emph{brackets}, \emph{escape}, and \emph{run}.
+We will use MetaOCaml \cite{Calcagno2003implementing}, an OCaml extension
+with MSP support through these three staging constructs, to briefly explain
 these constructs.
-MetaOCaml is an OCaml extension with MSP support through these three staging
-constructs.
-
+%
 Brackets, written \texttt{.<>.}, delay the execution of a computation:
 \begin{verbatim}
     let x = 1 + 1;;
@@ -185,49 +193,45 @@ Run, written \texttt{.!}, compiles and executes staged code:
 In this example, the run annotation compiles and executes the code inside
 \texttt{z}, assigning the integer \texttt{4} to \texttt{r}.
 
-Implementing DSLs is the most interesting feature of MSP \cite{Czarnecki2004DSL}.
-Programming languages are either interpreted or compiled.
-Even though compiled languages usually produce code that run faster
-due to optimizations, introducing code optimizations in the compiler
+Implementing DSLs is one of the most interesting applications of MSP \cite{Czarnecki2004DSL}.
+Implementing efficient DSLs, either as interpreters or as compilers,
 is not an easy task.
-The MSP constructs allow programmers to write an interpreter for a
-programming language and then annotate the code to stage the interpreter
-into that execute code as faster as a compiled code.
-The staged interpreter translates the DSL code to the host language code,
-and that is the reason why it can run efficient code \cite{Taha2004gentle}.
+The MSP constructs allow programmers to implement a DSL as
+a staged interpreter, which translates the DSL code to the host language code,
+allowing them to run as efficiently as the host code, taking advantage
+of the optimizations of the underlying compiler \cite{Taha2004gentle}.
 
 Mint \cite{Westbrook2010Mint} is a MSP extension to Java.
 Even though MSP ensures correctness while embedding languages using
 purely functional languages, the same is not that straightforward when
 we try to use MSP for embbeding imperative languages.
 The problem of embedding a language in an imperative language is
-related to side effects, as programmers can use free variables
-undeliberatedly.
+related to side effects, as programmers can move code objects
+beyond the bound scope of free variables inadvertedly, a problem
+known as scope extrusion.
 Mint extends the semantics of the escape construct to to impose
 some restrictions on side effects, not allowing side effects to
 appear inside a escape construct when these side effects interact
 with delayed code.
 
-LINQ (Language Integrated-Query) \cite{linq} is a set of resources that
+LINQ (Language Integrated-Query) \cite{linq} is a set of features that
 extends C\#, allowing programmers to perform queries and manipulate data over
 different kinds of data storage such as XML and MDF.
-We can also use LINQ with data structures such as lists and arrays.
+One can also use LINQ with data structures such as lists and arrays.
 
 Terra \cite{DeVito2013Terra} is MSP language that is embedded in Lua
-for high-performing computing.
+for high-performance computing.
 
 Metalua \cite{metalua} is a Lua compiler that supports compile-time
-meta-programming (CTMP), a mechanism that allows programmers to interact
+meta-programming, a mechanism that allows programmers to interact
 with the compiler through a macro system \cite{Fleutot2007contrasting}.
 Metalua extends Lua 5.1 to provide methods for transforming Lua
-code into Abstract Syntax Trees (ASTs), but this code cannot contain
+code into Abstract Syntax Trees, but this code cannot contain
 \emph{upvalues}.
-In Lua, \emph{upvalues} are \emph{non-local variables}, that is,
-they are free variables that are not defined in the local scope,
-but they are often defined inside an anonymous function \cite{Ierusalimschy2006PIL}.
-In the next section we will show that our approach can generate
-the same AST that Metalua generates, but including information
-about \emph{upvalues}.
+In Lua, \emph{upvalues} are non-local variables, that is,
+they are free variables that are not defined in the local scope \cite{Ierusalimschy2006PIL}.
+Our implementation generates program ASTs in the same format as
+Metalua, but including information about \emph{upvalues}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Lua2AST}
