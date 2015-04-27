@@ -232,12 +232,34 @@ We can also use LINQ with data structures such as lists and arrays.
 
 
 Lua2AST is a Lua module that takes a restricted form of Lua function, that we named lambda functions, and generates its AST in runtime.
-Lambda functions is defined here as functions that only contains the return statement.
+Lambda functions are defined here as functions that only contain the return statement.
 The expression contained in the return statement can be of any kind and can also use variables of the outer lexical scope.
 In Lua, this kind of variables are called upvalues.
 The process of generation uses externs libraries: luadec and lua-parser.
-Luadec \cite{LuaDec} is a Lua decompiler that takes a Lua binary chunk and returns a string with equivalent code.
-Lua-parser \cite{lua-parser} generates a Lua AST from a string with a valid Lua code.
+Lua-parser\cite{TODO} generates a Lua AST from a string with a valid Lua code.
+Luadec\cite{TODO} is a Lua decompiler that takes a Lua binary chunk and returns a string with equivalent code.
+
+One big difference from this work to the related works is that we use a decompiler and do not annotate the code.
+Some advantages lie in the use of a decompiler: 
+(1) No modification in virtual machine; 
+(2) More transparent to the programmer; 
+(3) All the process is performed in runtime;
+(4) Lua's eval function can be used.
+As explained in following paragraphs.
+
+Since a decompiler is used there is no need to modify the Lua's virtual machine source code.
+So, the library takes a runtime binary chunk and uses the decompiler to get an equivalent code.
+
+Because the transformation is done via library, programmers do not need to annotate the code from which they want to generate the AST.
+Thanks to that the process is more transparent to the developers and they do not need to learn any aditional syntax or rules.
+
+
+Lua is a dynamic language and has powerfull features like eval functions, which  are frenquently used.
+In order to keep these functions when using Lua2AST, all the process must be done at runtime.
+But all we have at this stage to do that is the binary chunk. 
+Then to get the AST we must decompile it.
+With this, our approach of using a decompiler preserves powerfull features of the language, which would not be possible if we used a preprocessor instead.
+
 
 %% TODO : detalhar o pq do uso do luadec - diferenciar dos related works
 %% explicitando as vantagens de utilizar o LuaDec
