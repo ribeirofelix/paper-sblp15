@@ -165,35 +165,29 @@ To do that, it introduces three constructs that programmers can use to
 annotate code: \emph{brackets}, \emph{escape}, and \emph{run}.
 We will use MetaOCaml \cite{Calcagno2003implementing}, an OCaml extension
 with MSP support through these three staging constructs, to briefly explain
-these constructs.
-%
-Brackets, written \texttt{.<>.}, delay the execution of a computation:
+these constructs. \emph{Brackets}, marked with \texttt{.<>.}, delay the execution of a computation:
 \begin{verbatim}
     let x = 1 + 1;;
     let y = .< 1 + 1 >.;;
 \end{verbatim}
 
-In this example, \texttt{x} has type \texttt{int} and \texttt{y} has
+In the above example, \texttt{x} has type \texttt{int} and \texttt{y} has
 type \texttt{int code} in MetaOCaml. 
 This means that the expression \texttt{x + y} is invalid code in MetaOCaml,
-as the types of both variables do not match.
-
-Escapes, written \texttt{.~}, combine small delayed computations for building
+as the types of both variables do not match. \emph{Escapes}, marked as \texttt{.\~}, combine small delayed computations for building
 bigger ones:
 \begin{verbatim}
     let z = .< x + .~y >.;;
 \end{verbatim}
 
-In this example, the code \texttt{.< x + .~y >.} binds a new delayed computation
-\texttt{2 + (1 + 1)} to \texttt{z}.
+Here, the code \texttt{.< x + .\~{}y >.} binds a new delayed computation
+\texttt{2 + (1 + 1)} to \texttt{z}. \emph{Run}, using the prefix operator \texttt{.!}, compiles and executes staged code.
+In the example below, the program will compile and execute the code inside
+\texttt{z}, assigning the integer \texttt{4} to \texttt{r}.
 
-Run, written \texttt{.!}, compiles and executes staged code:
 \begin{verbatim}
     let r = .!z;;
 \end{verbatim}
-
-In this example, the run annotation compiles and executes the code inside
-\texttt{z}, assigning the integer \texttt{4} to \texttt{r}.
 
 Implementing DSLs is one of the most interesting applications of MSP \cite{Czarnecki2004DSL}.
 Implementing efficient DSLs, either as interpreters or as compilers,
