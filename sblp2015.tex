@@ -68,8 +68,8 @@ that some aspects of a problem are handled with the DSL while other parts are
 developed in a general-purpose language \cite{Fowler:2010:DSL:1809745}. One
 way to do this is to embed source code written in the domain-specific language
 into the source code of the application, which is written in another language.
-We have then the notion of a "host language" and an "embedded language". SQL
-is an example of language which is often used in this fashion.
+We have then the notion of a \emph{host language} and an \emph{embedded language}.
+SQL is an example of language which is often used in this fashion.
 
 Embedding source code of one language into another poses challenges.
 Typically, a language parser does not have support for handling
@@ -108,7 +108,7 @@ are used outside of the scope of the binder of their free variables
 In purely functional languages we do not have this problem 
 due to the absence of side effects \cite{Kameyama2008CSS}.
 
-In this work, we propose an approach for meta-programming which
+In this work, we propose an approach for meta-programming
 in which the embedded code shares variables with the
 host language, preserving lexical scoping rules even after the code is
 converted into an intermediate representation.
@@ -121,7 +121,7 @@ We demonstrate this approach through a module for meta-programming using Lua
 as both embedded and host languages.
 Our module decompiles Lua functions to their Abstract Syntax Tree (AST) form
 and can later rebuild them preserving scoping rules of the decompilation site.
-For simplicity, our implementation only supports functions that contain a
+For simplicity, our implementation only supports functions that contain
 a single expression.
 We call these functions \emph{lambda functions}.
 
@@ -183,7 +183,7 @@ bigger ones:
 Here, the code \texttt{.< x + .\~{}y >.} binds a new delayed computation
 \texttt{2 + (1 + 1)} to \texttt{z}. \emph{Run}, using the prefix operator \texttt{.!}, compiles and executes staged code.
 In the example below, the program will compile and execute the code inside
-\texttt{z}, assigning the integer \texttt{4} to \texttt{r}.
+\texttt{z}, assigning the integer \texttt{4} to \texttt{r}:
 
 \begin{verbatim}
     let r = .!z;;
@@ -205,7 +205,7 @@ The problem of embedding a language in an imperative language is
 related to side effects, as programmers can move code objects
 beyond the bound scope of free variables inadvertedly, a problem
 known as scope extrusion.
-Mint extends the semantics of the escape construct to to impose
+Mint extends the semantics of the escape construct to impose
 some restrictions on side effects, not allowing side effects to
 appear inside a escape construct when these side effects interact
 with delayed code.
@@ -248,7 +248,7 @@ Some advantages lie in the use of a decompiler:
 \item No modification in virtual machine; 
 \item More transparent to the programmer; 
 \item All the process is performed in runtime;
-\item Lua's eval function can be used.
+\item Lua's \texttt{eval} function can be used.
 \end{enumerate}
 In the following paragraphs we explain these advantages in more detail.
 
@@ -274,7 +274,7 @@ With this, our approach of using a decompiler preserves powerfull features of th
 %% nossa abordagem ela integra bem com as caracteristicas dinamicas da linguagem
 %% o q nao seria possivel se fosse feita atraves de preprocessador
 %% pontuar q o processo inteiro ocorre em tempo de execucao
-This module contains two principal functions: toAST e compile.
+This module contains two principal functions: \texttt{toAST} and \texttt{compile}.
 The first one generates an AST and the second one compiles an AST.
 
 \subsection{Function toAST(func) }
