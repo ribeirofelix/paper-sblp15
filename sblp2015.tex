@@ -7,7 +7,7 @@
 \usepackage{amsmath}
 \usepackage{babel}
 
-\title{Preserving Lexical Scoping While Embedding Languages}
+\title{An Approach for Preserving Lexical Scoping When Embedding Languages}
 
 \author{
 Félix Ribeiro,
@@ -215,19 +215,83 @@ extends C\#, allowing programmers to perform queries and manipulate data over
 different kinds of data storage such as XML and MDF.
 One can also use LINQ with data structures such as lists and arrays.
 
-Terra \cite{DeVito2013Terra} is MSP language that is embedded in Lua
-for high-performance computing.
+In .NET, C\# and Visual Basic define a restricted type of anonymous
+function called an \emph{expression lambda}, which is a function that
+consists of a single expression. LINQ works as an embedded DSL
+\cite{Fowler:2010:DSL:1809745} where anonymous functions are used
+extensively, and was the motivating use case for the introduction
+of expression lambdas. When one assigns an expression lambda to a variable
+of type \texttt{Expression<TDelegate>}, .NET creates an AST
+corresponding to that expression, called an \emph{expression tree}
+\footnote{Note that in C\# parlance, \emph{lambda expression} is a
+more general term that can refer to both single-expression anonymous functions
+called \emph{expression lambdas} and multi-statement functions called
+\emph{statement lambdas}. Conversion to expression trees is only supported for
+expression lambdas.}. Expression trees can also be created 
+programatically, manipulating node objects via the API of the
+\texttt{Expression} class.
+
+\begin{figure}[t]
+\begin{verbatim}
+ 1    class Program {
+ 2      delegate int sumY (int arg);
+ 3      Expression <sumY> boo () {
+ 4        int y = 1;
+ 5        Expression <sumY> treesumY = x => x + y;
+ 6        return treesumY;
+ 7      }
+ 8      void foo () {
+ 9        int y = 10;
+10        Expression <sumY> ret = boo();
+11        int res = ret.Compile()(41); // res is 42
+12      }
+13    }
+\end{verbatim}
+\protect\caption{\label{fig:ExpressionTrees}Lexical scoping in variables
+referenced in expression trees in C\#.}
+\end{figure}
+
+Expression lambdas can access external local variables, and they respect
+lexical scope, regardless if they are used to declare anonymous functions or
+only to produce an expression tree. Expression trees can be compiled to
+produce an anonymous function at a different scope, and still they will
+reference variables from the point where the expression was created. Figure
+\ref{fig:ExpressionTrees} illustrates how lexical scoping is preserved in
+expression trees. Free variable \texttt{y} in line 5 references declaration
+from line 4, even when the expression tree returned in line 10 is compiled
+into a function in line 11.
+
+Terra \cite{DeVito2013Terra} is a multi-stage language for high-performance
+computing. It extends Lua, using it as a host language and defines extensions
+for staged computation. Lua functions that run in the Lua interpreter are
+declared using standard Lua syntax, with the \texttt{function} statement.
+Staged code is declared as Terra functions, using the \texttt{terra}
+statement. Terra functions use similar syntax to Lua, but they are statically
+typed and compiled into native code using LLVM. Lua code can manipulate Terra
+types and functions as Lua objects. Terra also features a \texttt{quote} statement
+for quoting blocks of Terra code as expression objects and brackets
+(\texttt{[]}) as the escape operator for evaluating Lua code inside a Terra
+function.
+
+Any free Lua variables referenced in Terra functions are bound at the time of
+their declarations, as are Lua expressions escaped inside Terra functions
+using brackets. A Terra function, therefore, does not form a closure with
+respect to free Lua variables. This design trades lexical scoping for the
+guarantee that compiled Terra code does not need to call back into the Lua
+interpreter during execution.
 
 Metalua \cite{metalua} is a Lua compiler that supports compile-time
 meta-programming, a mechanism that allows programmers to interact
 with the compiler through a macro system \cite{Fleutot2007contrasting}.
 Metalua extends Lua 5.1 to provide methods for transforming Lua
 code into Abstract Syntax Trees, but this code cannot contain
-\emph{upvalues}.
-In Lua, \emph{upvalues} are non-local variables, that is,
+\emph{upvalues}. In Lua, \emph{upvalues} are non-local variables, that is,
 they are free variables that are not defined in the local scope \cite{Ierusalimschy2006PIL}.
+
 Our implementation generates program ASTs in the same format as
-Metalua, but including information about \emph{upvalues}.
+Metalua, but including information about \emph{upvalues}. While Metalua
+handles arbitrary Lua code syntactically marked for quoting, our module
+operates only on restricted functions, but requires no quoting.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Lua2AST}
@@ -237,8 +301,8 @@ Metalua, but including information about \emph{upvalues}.
 Lua2AST is a Lua module that takes a restricted form of Lua function, that we named lambda functions, and generates its AST in runtime.
 Lambda functions are defined here as functions that only contain the return statement.
 The expression contained in the return statement can be of any kind and can also use variables of the outer lexical scope.
-In Lua, this kind of variables are called upvalues.
-The process of generation uses externs libraries: luadec and lua-parser.
+
+The process of generation uses external libraries: luadec and lua-parser.
 Lua-parser \cite{lua-parser} generates a Lua AST from a string with a valid Lua code.
 Luadec \cite{luadec} is a Lua decompiler that takes a Lua binary chunk and returns a string with equivalent code.
 
