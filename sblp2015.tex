@@ -7,7 +7,7 @@
 \usepackage{amsmath}
 \usepackage{babel}
 
-\title{An Approach for Preserving Lexical Scoping When Embedding Languages}
+\title{Preserving Lexical Scoping When Dynamically Embedding Languages}
 
 \author{
 Félix Ribeiro,
@@ -61,7 +61,8 @@ A Domain-Specific Language is a programming language that
 includes features to express the semantics of a domain,
 often adding specific syntax.
 Examples of DSLs are \TeX{} for text processing, MATLAB for performing
-numerical computations, and SQL for querying relational databases.
+numerical computations, SQL for querying relational databases and
+regular expressions for pattern matching in text.
 
 The use of DSLs frequently happens in combination with other languages, so
 that some aspects of a problem are handled with the DSL while other parts are
@@ -69,7 +70,7 @@ developed in a general-purpose language \cite{Fowler:2010:DSL:1809745}. One
 way to do this is to embed source code written in the domain-specific language
 into the source code of the application, which is written in another language.
 We have then the notion of a \emph{host language} and an \emph{embedded language}.
-SQL is an example of language which is often used in this fashion.
+SQL and regular expressions are examples of languages which are often used in this fashion.
 
 Embedding source code of one language into another poses challenges.
 Typically, a language parser does not have support for handling
@@ -78,16 +79,16 @@ code. Common approaches to handle the source code of two languages
 in a single source file are to either pull the processing back to a
 step prior to the parsing of the main language, using pre-processing,
 or to push it forward by storing the code written in the embedded
-language as strings in the host language source code, which are only
-sent to the embedded language for processing at run time.
+language as strings in the host language source code, which are
+sent to the embedded language for processing only at run time.
 
 This approach of storing code as strings, while popular, has some inconveniences.
-For instance, it is hard to detect syntactical errors while compiling the code.
+For instance, it is not possible to detect syntactical errors while compiling the code.
 Embedding languages should also allow programmers to transfer data
-between these languages, preferrably minimizing duplication.
-For these reasons, solutions based on meta-programming where the
+between these languages, taking care to keep data in sync.
+For these reasons, solutions based on meta-programming, where the
 embedded language can be manipulated at a higher level of abstraction
-than strings are more interesting.
+than strings, are more interesting.
 
 Multi-Stage Programming (MSP) \cite{Taha1999MSP,Taha2004gentle,Taha2008gentle}
 is a meta-programming approach that helps embedding a programming language in
@@ -115,7 +116,7 @@ converted into an intermediate representation.
 In our proposed method, the host language uses closures
 to share data with the embedded language, replacing variable references
 with function calls in the generated code.
-This way, we ensure that free variables always match the scope of their declarations.
+This way, we ensure that variables always match the scope of their declarations.
 
 We demonstrate this approach through a module for meta-programming using Lua
 as both embedded and host languages.
