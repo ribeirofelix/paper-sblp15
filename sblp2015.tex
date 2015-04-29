@@ -629,7 +629,7 @@ namespace and a modified store which includes the required closures.
 Note that $\overset{D}{\rightarrow}$ is defined only for variables
 (\textsc{DVar}), base values (\textsc{DBase}), the binary operator
 (\textsc{DOp}), and the initial function (\textsc{DFn}), mirroring
-the implementation of \emph{toAST}() in LuaToAST. Its rules deconstruct
+the implementation of \emph{toAST}() in Lua2AST. Its rules deconstruct
 the body of the function and build the corresponding AST. Of particular
 interest is rule \textsc{DVar}, which stores in the AST node a fresh
 variable $x'$ (i.e. one guaranteed not to exist in $\Gamma$) and
@@ -687,12 +687,12 @@ Our implementation also exploited Lua's facilities for manipulating
 a closure's symbol table, which allowed the construction of the
 generated functions purely through manipulation of Lua function
 objects, without having to resort to low-level bytecode generation.
-The only bytecode-level manipulation performed by LuaToAST is
+The only bytecode-level manipulation performed by Lua2AST is
 read-only, and is restricted to the decompiler module. The
 implementation did not require any modifications to the Lua VM.
 
 We also specified the operational semantics for the transformations
-performed by LuaToAST, in order to show how the lexical environment
+performed by Lua2AST, in order to show how the lexical environment
 of variables is correctly preserved, and to properly contrast it with
 related work from the literature on multi-stage programming.
 
