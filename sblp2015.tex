@@ -145,35 +145,34 @@ In Section \ref{sec:conclusion} we present our conclusions.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \label{sec:related}
 
-Meta-programming allows programmers to improve code performance
-or expressiveness by defining transformations so that they
-can program at a higher level of abstraction but, once these
-transformations are applied, still produce efficient code.
+Meta-programming is the concept of writing programs that manipulate
+program code as data, producing other programs. This allows programmers
+to improve code performance or expressiveness by defining transformations over code.
 Lisp \cite{McCarthy1960RFS} pioneered meta-programming by introducing
-a mechanism called \emph{quasi-quotation}
-that is useful for various forms of program generation.
-Its macro system is powered by the operator \texttt{`}, which can be
-applied to an expression.
-When the Lisp interpreter finds this operator, it does not evaluate the expression,
-but it creates an AST for that expression \cite{Bawden1999quasiquotation}.
-The AST can then be manipulated and later converted into code.
+a mechanism of \emph{quotation}: expressions marked with the operator \texttt{'}
+are not evaluated, and are treated as data.
+Later Lisp dialects like Common Lisp and Scheme include \emph{quasi-quotation},
+represented with the operator \texttt{`}, that allows parts of the quoted expression
+to be ``escaped'' (with the  \texttt{,} operator). The combination of
+quasi-quotation and escaping powers the macro system of those languages \cite{Bawden1999quasiquotation}.
 This feature, however, does not preserve scoping rules.
 
 Multi-Stage Programming \cite{Taha1999MSP,Taha2004gentle,Taha2008gentle} is
-similar to the quasi-quotation mechanism introduced by Lisp,
+similar to the quasi-quotation mechanism,
 but it takes lexical scoping into account.
-To do that, it introduces three constructs that programmers can use to
+it features three constructs that programmers can use to
 annotate code: \emph{brackets}, \emph{escape}, and \emph{run}.
 We will use MetaOCaml \cite{Calcagno2003implementing}, an OCaml extension
 with MSP support through these three staging constructs, to briefly explain
-these constructs. \emph{Brackets}, marked with \texttt{.<>.}, delay the execution of a computation:
+these constructs. \emph{Brackets}, marked with \texttt{.<>.}, avoid the execution of a computation,
+constructing an object instead that represents the marked block of code:
 \begin{verbatim}
     let x = 1 + 1;;
     let y = .< 1 + 1 >.;;
 \end{verbatim}
 
 In the above example, \texttt{x} has type \texttt{int} and \texttt{y} has
-type \texttt{int code} in MetaOCaml. 
+type \texttt{int code}. 
 This means that the expression \texttt{x + y} is invalid code in MetaOCaml,
 as the types of both variables do not match. \emph{Escapes}, marked as \texttt{.\~}, combine small delayed computations for building
 bigger ones:
@@ -182,7 +181,7 @@ bigger ones:
 \end{verbatim}
 
 Here, the code \texttt{.< x + .\~{}y >.} binds a new delayed computation
-\texttt{2 + (1 + 1)} to \texttt{z}. \emph{Run}, using the prefix operator \texttt{.!}, compiles and executes staged code.
+\texttt{2 + (1 + 1)} to \texttt{z}. \emph{Run}, using the prefix operator \texttt{.!}, executes staged code.
 In the example below, the program will compile and execute the code inside
 \texttt{z}, assigning the integer \texttt{4} to \texttt{r}:
 
@@ -195,7 +194,7 @@ Implementing efficient DSLs, either as interpreters or as compilers,
 is not an easy task.
 The MSP constructs allow programmers to implement a DSL as
 a staged interpreter, which translates the DSL code to the host language code,
-allowing them to run as efficiently as the host code, taking advantage
+allowing DSLs to run as efficiently as the host code, taking advantage
 of the optimizations of the underlying compiler \cite{Taha2004gentle}.
 
 Mint \cite{Westbrook2010Mint} is a MSP extension to Java.
@@ -210,6 +209,9 @@ Mint extends the semantics of the escape construct to impose
 some restrictions on side effects, not allowing side effects to
 appear inside a escape construct when these side effects interact
 with delayed code.
+
+% TODO: Mint example?
+% (illustrate scope extrusion problem / how it solves it)
 
 LINQ (Language Integrated-Query) \cite{linq} is a set of features that
 extends C\#, allowing programmers to perform queries and manipulate data over
@@ -239,14 +241,15 @@ programatically, manipulating node objects via the API of the
  3      Expression <sumY> boo () {
  4        int y = 1;
  5        Expression <sumY> treesumY = x => x + y;
- 6        return treesumY;
- 7      }
- 8      void foo () {
- 9        int y = 10;
-10        Expression <sumY> ret = boo();
-11        int res = ret.Compile()(41); // res is 42
-12      }
-13    }
+ 6        y = y + 1;
+ 7        return treesumY;
+ 8      }
+ 9      void foo () {
+10        int y = 10;
+11        Expression <sumY> ret = boo();
+12        int res = ret.Compile()(40); // res is 42
+13      }
+14    }
 \end{verbatim}
 \protect\caption{\label{fig:ExpressionTrees}Lexical scoping in variables
 referenced in expression trees in C\#.}
@@ -254,18 +257,16 @@ referenced in expression trees in C\#.}
 
 Expression lambdas can access external local variables, and they respect
 lexical scope, regardless if they are used to declare anonymous functions or
-only to produce an expression tree. Expression trees can be compiled to
-produce an anonymous function at a different scope, and still they will
-reference variables from the point where the expression was created. Figure
+only to produce an expression tree. Figure
 \ref{fig:ExpressionTrees} illustrates how lexical scoping is preserved in
 expression trees. Free variable \texttt{y} in line 5 references declaration
-from line 4, even when the expression tree returned in line 10 is compiled
-into a function in line 11.
+from line 4, even when the expression tree returned in line 11 is compiled
+into a function in line 12.
 
 Terra \cite{DeVito2013Terra} is a multi-stage language for high-performance
-computing. It extends Lua, using it as a host language and defines extensions
+computing. It uses Lua as a host language and defines extensions
 for staged computation. Lua functions that run in the Lua interpreter are
-declared using standard Lua syntax, with the \texttt{function} statement.
+declared using standard Lua syntax, with the \texttt{function} construct.
 Staged code is declared as Terra functions, using the \texttt{terra}
 statement. Terra functions use similar syntax to Lua, but they are statically
 typed and compiled into native code using LLVM. Lua code can manipulate Terra
@@ -274,9 +275,9 @@ for quoting blocks of Terra code as expression objects and brackets
 (\texttt{[]}) as the escape operator for evaluating Lua code inside a Terra
 function.
 
-Any free Lua variables referenced in Terra functions are bound at the time of
-their declarations, as are Lua expressions escaped inside Terra functions
-using brackets. A Terra function, therefore, does not form a closure with
+When a Terra function is declared, all Lua expressions escaped inside it
+and Lua variables are replaced by the results of their evaluation.
+A Terra function, therefore, does not form a closure with
 respect to free Lua variables. This design trades lexical scoping for the
 guarantee that compiled Terra code does not need to call back into the Lua
 interpreter during execution.
@@ -286,11 +287,10 @@ meta-programming, a mechanism that allows programmers to interact
 with the compiler through a macro system \cite{Fleutot2007contrasting}.
 Metalua extends Lua 5.1 to provide methods for transforming Lua
 code into Abstract Syntax Trees, but this code cannot contain
-\emph{upvalues}. In Lua, \emph{upvalues} are non-local variables, that is,
-they are free variables that are not defined in the local scope \cite{Ierusalimschy2006PIL}.
+references to local variables of declared in an outer scope.
 
 Our implementation generates program ASTs in the same format as
-Metalua, but including information about \emph{upvalues}. While Metalua
+Metalua, but including information about enclosing local variables. While Metalua
 handles arbitrary Lua code syntactically marked for quoting, our module
 operates only on restricted functions, but requires no quoting.
 
@@ -302,6 +302,8 @@ operates only on restricted functions, but requires no quoting.
 Lua2AST is a Lua module that takes a restricted form of Lua function, that we named lambda functions, and generates its AST in runtime.
 Lambda functions are defined here as functions that only contain the return statement.
 The expression contained in the return statement can be of any kind and can also use variables of the outer lexical scope.
+
+% TODO: explain upvalues, \cite{Ierusalimschy2006PIL}
 
 The process of generation uses external libraries: luadec and lua-parser.
 Lua-parser \cite{lua-parser} generates a Lua AST from a string with a valid Lua code.
