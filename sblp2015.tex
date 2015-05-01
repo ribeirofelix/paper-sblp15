@@ -464,7 +464,7 @@ with constructs to specify Lua2AST}
 The syntax of our version of Lua Core is presented in Figure \ref{fig:LuaCoreSyntax}.
 A Lua expression ($e$) can be either a base value ($b$), a variable
 ($x$), a scoped variable definition ($\mbox{let \ensuremath{x=e}\ in\ \ensuremath{e}}$,
-with $e_{1};e_{2}$ as sugar for $\mbox{let \ensuremath{\_=e_{1}}in \ensuremath{e_{2}}}$),
+with $e_{1};e_{2}$ as sugar for $\mbox{let \ensuremath{\_=e_{1}} in \ensuremath{e_{2}}}$),
 a variable assignment ($x\coloneqq e$), an application ($e(e)$),
 a function definition ($\mbox{fun}(x)\{e\}$), an operation on expressions
 ($e\mbox{ op }e$), or one of the special invocations \emph{toAST($e$)}
@@ -479,7 +479,7 @@ which may contain nodes that wrap base values\emph{ }($[\mbox{base }b]$\emph{),
 As we will see below, the fact that variables are wrapped by a node
 containing a closure is central to our approach.
 
-\begin{figure}[t]
+\begin{figure}[t!]
 {\footnotesize{}}%
 \begin{minipage}[t]{0.59\columnwidth}%
 {\footnotesize{}
@@ -619,7 +619,9 @@ that maps memory positions to values%
 environment $\Sigma=(\Gamma,S,F)$ where $F$ is specific to Terra
 functions. In our presentation, we removed $F$. Rules reused from
 \cite{DeVito2013Terra} were adapted accordingly.%
-}. We use $\overset{L}{\rightarrow}:(e\times\Sigma)\rightarrow(v\times\Sigma)$
+}.
+
+We use $\overset{L}{\rightarrow}:(e\times\Sigma)\rightarrow(v\times\Sigma)$
 for the evaluation of Lua expressions as in \cite{DeVito2013Terra}.
 Rules for $\overset{L}{\rightarrow}$ presented here are equivalent
 to those in that work: \textsc{LVal} and \textsc{LVar} evaluate values
