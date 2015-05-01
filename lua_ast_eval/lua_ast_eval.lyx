@@ -69,8 +69,8 @@
 \begin_body
 
 \begin_layout Standard
-In this section, we specify below the behavior of toAST() and compile()
- by using the formalization of a subset of Lua semantics, presented in 
+In this section, we specify the behavior of toAST() and compile() by using
+ the formalization of a subset of Lua semantics, presented in 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "DeVito2013Terra"
@@ -113,7 +113,7 @@ status open
 \begin{eqnarray*}
 e & = & b\,|\, x\,|\,\mbox{let \ensuremath{x=e}\,\ in\,\ensuremath{e}}\,|\, x\coloneqq e\,|\, e(e)\,|\,\mbox{fun}(x)\{e\}\,|\, e\mbox{ op }e\,|\,\mbox{toAST}(e)\,|\,\mbox{compile}(a)\\
 v & = & b\,|\,\left\langle \Gamma,x,e\right\rangle \,|\, a\\
-a & = & [\mbox{fn\,\ensuremath{x}\,\ensuremath{a}}]\,|\,[\mbox{base \ensuremath{b}}]\,|\,[\mbox{var}\, x\,\left\langle \Gamma,x,e\right\rangle ]\,|\,[\mbox{op\,\ensuremath{a}\,\ensuremath{a}}]
+a & = & [\mbox{fn\,\ensuremath{x}\,\ensuremath{a}}]\,|\,[\mbox{base \ensuremath{b}}]\,|\,[\mbox{var}\,\left\langle \Gamma,x,e\right\rangle ]\,|\,[\mbox{op\,\ensuremath{a}\,\ensuremath{a}}]
 \end{eqnarray*}
 
 \end_inset
@@ -150,28 +150,28 @@ reference "fig:LuaCoreSyntax"
 \end_inset
 
 .
- Lua expressions (
+ A Lua expression (
 \begin_inset Formula $e$
 \end_inset
 
-) can be base values (
+) can be either a base value (
 \begin_inset Formula $b$
 \end_inset
 
-), variables (
+), a variable (
 \begin_inset Formula $x$
 \end_inset
 
 ), a scoped variable definition (
-\begin_inset Formula $\mbox{let \ensuremath{x=e}\,\ in\,\ensuremath{e}}$
+\begin_inset Formula $\mbox{let \ensuremath{x=e}\ in\ \ensuremath{e}}$
 \end_inset
 
 , with 
-\begin_inset Formula $e;e$
+\begin_inset Formula $e_{1};e_{2}$
 \end_inset
 
  as sugar for 
-\begin_inset Formula $\mbox{let \ensuremath{\_=e}\,\ in\,\ensuremath{e}}$
+\begin_inset Formula $\mbox{let \ensuremath{\_=e_{1}}in \ensuremath{e_{2}}}$
 \end_inset
 
 ), a variable assignment (
@@ -186,7 +186,7 @@ reference "fig:LuaCoreSyntax"
 \begin_inset Formula $\mbox{fun}(x)\{e\}$
 \end_inset
 
-) or an operation on expressions (
+), an operation on expressions (
 \family roman
 \series medium
 \shape up
@@ -202,12 +202,7 @@ reference "fig:LuaCoreSyntax"
 \begin_inset Formula $e\mbox{ op }e$
 \end_inset
 
-, with semantics defined by a function 
-\begin_inset Formula $Op$
-\end_inset
-
-).
- We extend this by adding operations 
+), or one of the special invocations 
 \family default
 \series default
 \shape default
@@ -284,15 +279,36 @@ compile(
 \begin_inset Formula $b$
 \end_inset
 
-), closures (
-\begin_inset Formula $\left\langle \Gamma,x,e\right\rangle $
-\end_inset
-
-) or Lua ASTs (
+), Lua ASTs (
 \begin_inset Formula $a$
 \end_inset
 
-).
+) or closures.
+ A closure is represented as a triple 
+\begin_inset Formula $\left\langle \Gamma,x,e\right\rangle $
+\end_inset
+
+, consisting of a namespace 
+\begin_inset Formula $\Gamma:x\rightarrow p$
+\end_inset
+
+ (mapping variable names 
+\begin_inset Formula $x$
+\end_inset
+
+ to memory positions 
+\begin_inset Formula $p$
+\end_inset
+
+), an input argument 
+\begin_inset Formula $x$
+\end_inset
+
+ and an expression body 
+\begin_inset Formula $e$
+\end_inset
+
+.
  A Lua AST for a function consists of a root node (
 \begin_inset Formula $[\mbox{fn\,\ensuremath{x}\,\ensuremath{a}}]$
 \end_inset
@@ -309,15 +325,17 @@ compile(
 \emph on
 ), 
 \emph default
-variables (
-\begin_inset Formula $[\mbox{var }x\,\left\langle \Gamma,x,e\right\rangle ]$
-\end_inset
-
-) and operations (
+operations (
 \begin_inset Formula $[\mbox{op}\, a\, a]$
 \end_inset
 
+), and variables (
+\begin_inset Formula $[\mbox{var }\left\langle \Gamma,x,e\right\rangle ]$
+\end_inset
+
 ).
+ As we will see below, the fact that variables are wrapped by a node containing
+ a closure is central to our approach.
 \end_layout
 
 \begin_layout Standard
@@ -407,7 +425,7 @@ e_{3},(\Gamma_{1}[x\leftarrow p],S_{3}[p\leftarrow v_{1}])\overset{L}{\rightarro
 \size footnotesize
 \begin_inset Formula 
 \[
-\frac{e_{1},\Sigma_{1}\overset{L}{\rightarrow}v_{1},(\Gamma,S)\,\,\,\,\,\,\,\,\Gamma(x)=p}{x\coloneqq e,\Sigma\overset{L}{\rightarrow}v,(\Gamma,S[p\leftarrow v])}\textsc{ (LAsn)}
+\frac{e_{1},\Sigma_{1}\overset{L}{\rightarrow}v,(\Gamma,S)\,\,\,\,\,\,\,\,\Gamma(x)=p}{x\coloneqq e,\Sigma\overset{L}{\rightarrow}v,(\Gamma,S[p\leftarrow v])}\textsc{ (LAsn)}
 \]
 
 \end_inset
@@ -436,7 +454,7 @@ e_{3},(\Gamma_{1}[x\leftarrow p],S_{3}[p\leftarrow v_{1}])\overset{L}{\rightarro
 \frac{\begin{array}[t]{c}
 e_{1},\Sigma_{1}\overset{L}{\rightarrow}v_{1},\Sigma_{2}\,\,\,\,\,\,\,\, e_{2},\Sigma_{2}\overset{L}{\rightarrow}v_{2},\Sigma_{3}\\
 v_{3}=Op(v_{1},v_{2})
-\end{array}}{e_{1}\mbox{\, op\,}e_{2},\Sigma_{1}\overset{L}{\rightarrow}v_{3},\Sigma_{3}}\textsc{ (LOp)}
+\end{array}}{e_{1}\mbox{\,\ op\,}e_{2},\Sigma_{1}\overset{L}{\rightarrow}v_{3},\Sigma_{3}}\textsc{ (LOp)}
 \]
 
 \end_inset
@@ -462,7 +480,7 @@ v_{3}=Op(v_{1},v_{2})
 \size footnotesize
 \begin_inset Formula 
 \[
-\frac{a,\Sigma_{1}\overset{C}{\rightarrow}e,\Sigma_{2}}{\mbox{compile(\ensuremath{a})},\Sigma_{1}\rightarrow e,\Sigma_{2}}\textsc{ (LComp)}
+\frac{a,\Sigma_{1}\overset{C}{\rightarrow}e,\Sigma_{2}\,\,\,\,\, e\overset{L}{\rightarrow}v}{\mbox{compile(\ensuremath{a})},\Sigma_{1}\overset{L}{\rightarrow}v,\Sigma_{2}}\textsc{ (LComp)}
 \]
 
 \end_inset
@@ -505,9 +523,7 @@ b,\Sigma\overset{D}{\rightarrow}[\mbox{base }b]\textsc{ (DBase)}
 \begin_inset Formula 
 \[
 \frac{\begin{array}[t]{c}
-\Sigma=(\Gamma,S)\\
-x'\,\mbox{fresh}
-\end{array}}{x,\Sigma\overset{D}{\rightarrow}[\mbox{var }x'\,\left\langle \Gamma,\_,x\right\rangle ]}\textsc{ (DVar)}
+\Sigma=(\Gamma,S)\end{array}}{x,\Sigma\overset{D}{\rightarrow}[\mbox{var }\left\langle \Gamma,\_,x\right\rangle ]}\textsc{ (DVar)}
 \]
 
 \end_inset
@@ -561,9 +577,9 @@ x'\,\mbox{fresh}
 \[
 \frac{\begin{array}[t]{c}
 \Sigma_{1}=(\Gamma,S)\\
-p\,\mbox{fresh}\\
+p\,\mbox{fresh}\,\,\,\,\, x'\,\mbox{fresh}\\
 \Sigma_{2}=(\Gamma[x'\leftarrow p],S[p\leftarrow f])
-\end{array}}{[\mbox{var }x'\, f],\Sigma_{1}\overset{C}{\rightarrow}x'(\_),\Sigma_{2}}\textsc{ (CVar)}
+\end{array}}{[\mbox{var }f],\Sigma_{1}\overset{C}{\rightarrow}x'(\_),\Sigma_{2}}\textsc{ (CVar)}
 \]
 
 \end_inset
@@ -664,13 +680,47 @@ reference "fig:Semantics"
 \begin_inset Formula $S:p\rightarrow v$
 \end_inset
 
- (where 
-\begin_inset Formula $p$
+ that maps memory positions to values
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+The semantics of Lua Core in 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "DeVito2013Terra"
+
 \end_inset
 
- are memory positions).
+ is based on an environment 
+\begin_inset Formula $\Sigma=(\Gamma,S,F)$
+\end_inset
+
+ where 
+\begin_inset Formula $F$
+\end_inset
+
+ is specific to Terra functions.
+ In our presentation, we removed 
+\begin_inset Formula $F$
+\end_inset
+
+.
+ Rules reused from 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "DeVito2013Terra"
+
+\end_inset
+
+ were adapted accordingly.
+\end_layout
+
+\end_inset
+
+.
  We use 
-\begin_inset Formula $\overset{L}{\rightarrow}$
+\begin_inset Formula $\overset{L}{\rightarrow}:(e\times\Sigma)\rightarrow(v\times\Sigma)$
 \end_inset
 
  for the evaluation of Lua expressions as in 
@@ -680,29 +730,78 @@ key "DeVito2013Terra"
 
 \end_inset
 
-; where rules have the same names, they have the same semantics as those
- presented in that work.
- We added rules 
+.
+ Rules for 
+\begin_inset Formula $\overset{L}{\rightarrow}$
+\end_inset
+
+ presented here are equivalent to those in that work: 
+\shape smallcaps
+LVal
+\shape default
+ and 
+\shape smallcaps
+LVar
+\shape default
+ evaluate values and variables; 
+\shape smallcaps
+LLet
+\shape default
+ describes variable scoping, by evaluating 
+\begin_inset Formula $e_{2}$
+\end_inset
+
+ in an environment created by adding the result of evaluating 
+\begin_inset Formula $e_{1}$
+\end_inset
+
+ and assigning it to local variable 
+\begin_inset Formula $x$
+\end_inset
+
+; 
+\shape smallcaps
+LApp
+\shape default
+ describes function application, propagating side effects; 
+\shape smallcaps
+LAsn
+\shape default
+ evaluates assignments; 
+\shape smallcaps
+LFun
+\shape default
+ evaluates function declarations.
+ Our work adds new rules for 
+\begin_inset Formula $\overset{L}{\rightarrow}$
+\end_inset
+
+: 
 \shape smallcaps
 LOp
 \shape default
- for the binary operation, 
+ describes the evaluation of an arbitrary binary operator, with semantics
+ given by some function 
+\begin_inset Formula $Op()$
+\end_inset
+
+; 
 \shape smallcaps
 LAst
 \shape default
- for the 
+ describes the evaluation of 
 \begin_inset Formula $toAST()$
 \end_inset
 
- function and 
+; 
 \shape smallcaps
 LComp
 \shape default
- for the 
-\emph on
-compile
-\emph default
-() function.
+ evaluates 
+\begin_inset Formula $compile()$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -716,25 +815,47 @@ We also add two other relations: rules for decompiling a Lua function into
 \end_inset
 
 ).
- In our formalization, decompiling the function produces an AST but does
- not affect the environment; all values produced are stored in the AST itself.
- Compiling returns an environment with an unmodified namespace and a modified
- store which includes the required closures.
- 
+ These are used in 
+\shape smallcaps
+LAst
+\shape default
+ and 
+\shape smallcaps
+LComp
+\shape default
+, respectively.
 \end_layout
 
 \begin_layout Standard
-Note that 
+The decompilation function 
 \begin_inset Formula $\overset{D}{\rightarrow}$
 \end_inset
 
- is defined only for variables (
-\shape smallcaps
-DVar
-\shape default
-), base values (
+ takes an expression and an environment and produces an AST.
+ Since 
+\begin_inset Formula $toAST()$
+\end_inset
+
+ is a pure function, 
+\begin_inset Formula $\Sigma$
+\end_inset
+
+ does not figure in the codomain of 
+\begin_inset Formula $\overset{D}{\rightarrow}$
+\end_inset
+
+.
+ Note that 
+\begin_inset Formula $\overset{D}{\rightarrow}$
+\end_inset
+
+ is defined only for base values (
 \shape smallcaps
 DBase
+\shape default
+), variables (
+\shape smallcaps
+DVar
 \shape default
 ), the binary operator (
 \shape smallcaps
@@ -748,64 +869,96 @@ DFn
 \emph on
 toAST
 \emph default
-() in LuaToAST.
+() in Lua2AST, which only supports functions containing these elements.
  Its rules deconstruct the body of the function and build the corresponding
  AST.
  Of particular interest is rule 
 \shape smallcaps
 DVar
 \shape default
-, which stores in the AST node a fresh variable 
-\begin_inset Formula $x'$
-\end_inset
-
- (i.e.
- one guaranteed not to exist in 
-\begin_inset Formula $\Gamma$
-\end_inset
-
-) and a newly created closure, which returns the value of 
+, which stores in the AST node a newly created closure, which returns the
+ value of 
 \begin_inset Formula $x$
 \end_inset
 
  given the original function's environment.
- In the complementary rule 
-\shape smallcaps
-CVar
-\shape default
-, this new variable 
-\begin_inset Formula $x'$
-\end_inset
-
- is assigned in the resulting environment to hold the node's closure 
-\begin_inset Formula $f$
-\end_inset
-
-.
- Note in rule 
-\shape smallcaps
-CFn
-\shape default
- that the derived namespace 
-\begin_inset Formula $\Gamma_{2}$
-\end_inset
-
- is used only in the resulting closure, whereas the derived store 
-\begin_inset Formula $S_{2}$
-\end_inset
-
- is used in the resulting environment.
- In 
-\begin_inset Formula $\Gamma_{2}$
-\end_inset
-
-, all variable references that existed in the original function that was
- decompiled and now recompiled were replaced by calls to newly-created closures
- that merely return the value of the corresponding variables.
 \end_layout
 
 \begin_layout Standard
-These closures use the original namespace from decompilation time (
+The compilation function 
+\begin_inset Formula $\overset{C}{\rightarrow}$
+\end_inset
+
+ takes an AST and an environment and produces a closure and a new environment.
+ For each of the four decompilation rules there is a complementary compilation
+ rule: 
+\shape smallcaps
+CBase
+\shape default
+, 
+\shape smallcaps
+CVar
+\shape default
+, 
+\shape smallcaps
+COp
+\shape default
+ and 
+\shape smallcaps
+CFn
+\shape default
+.
+ Rule 
+\shape smallcaps
+CVar
+\shape default
+ translates nodes representing variable references into a function call
+ to the closure created by rule 
+\shape smallcaps
+DVar
+\shape default
+.
+ 
+\shape smallcaps
+CVar
+\shape default
+ assigns this closure to a new variable 
+\begin_inset Formula $x'$
+\end_inset
+
+, guaranteed to be an unused symbol, to maintain hygiene.
+ Rule 
+\shape smallcaps
+CFn
+\shape default
+ returns a closure representing the entire compiled function and a new environme
+nt.
+ This environment contains an unmodified namespace 
+\begin_inset Formula $\Gamma_{1}$
+\end_inset
+
+ and a new store 
+\begin_inset Formula $S_{2}$
+\end_inset
+
+, which includes any closures created for keeping variable references.
+ The extended namespace 
+\begin_inset Formula $\Gamma_{2}$
+\end_inset
+
+ produced by the compilation is used as the namespace of the resulting function'
+s closure.
+\end_layout
+
+\begin_layout Standard
+As a result of running 
+\begin_inset Formula $compile()$
+\end_inset
+
+, all variable references that existed in the original function that was
+ decompiled and was now recompiled were replaced by calls to newly-created
+ closures that merely return the value of the corresponding variables.
+ These closures use the original namespace from decompilation time (
 \begin_inset Formula $\Gamma$
 \end_inset
 
@@ -828,7 +981,11 @@ DVar
 \begin_inset Formula $x'()$
 \end_inset
 
- will ensure that 
+ (produced by 
+\shape smallcaps
+CVar
+\shape default
+) will ensure that 
 \begin_inset Formula $x$
 \end_inset
 
