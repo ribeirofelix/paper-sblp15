@@ -354,7 +354,6 @@ The function's return is a Lua table that represents an AST.
 If the received function uses upvalues the returned table will be an annotated AST,so that the upvalues can be evaluated properly.
 
 % formatar os nomes bonitinho com \texttt{} como no resto do paper
-
 The \texttt{toAST(func)} function calls the function \textttt{luadec(arg)} that belongs to \texttt{libluadec}, sending the function that will be transformed in AST as argument.
 The return of the \texttt{luadec(arg)} is a string that represents the passed function code.
 This string is sent to the parse function of \texttt{lua-parser} library and it returns the AST that represents the code.
@@ -362,8 +361,8 @@ This string is sent to the parse function of \texttt{lua-parser} library and it 
 The received AST is traversed once.
 Firstly we find the parameters of the function and store them in a set.
 % eu não entendi isso:
-Later, we localize the free variables of the  function and when they are found a execution code lookup is made with the standard library debug.
-
+Later, we localize the free variables of the function.
+For each localized variable a code lookup is made with the standard library debug.
 The lookup consists in going through the upvalues that belongs to the function that was sent to \texttt{toAST} in order to find the variable of the same name.
 When the variable is found, we do the AST annotation process.
 
