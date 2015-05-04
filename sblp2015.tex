@@ -330,10 +330,11 @@ The first one generates an AST and the second one compiles an AST.
 The function \texttt{toAST} generates an AST from a Lua function.
 The parameter \texttt{func} must be a lambda function.
 The function's return is a Lua table that represents an AST.
-If the received function uses upvalues the returned table will be an annotated AST, so that the upvalues can be evaluated properly.
+If the received function uses upvalues the returned table will be a decorated AST, so that the upvalues can be evaluated properly.
 
-The function \texttt{toAST(func)} calls the function \texttt{luadec(arg)} that belongs to \texttt{libluadec}, sending the function that will be transformed in AST as argument.
-The return of the \texttt{luadec(arg)} is a string that represents the passed function code.
+The function \texttt{toAST} calls the function \texttt{luadec} that belongs to \texttt{libluadec}.
+\texttt{toAST} sends the received function to \texttt{luadec}. 
+The return of the \texttt{luadec} is a string that represents the passed function code.
 This string is sent to the parse function of \texttt{lua-parser} library and it returns the AST that represents the code.
 
 \texttt{toAST} traverses the received AST once.
