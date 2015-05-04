@@ -430,7 +430,7 @@ It uses the AST that was generated in line 5 by \texttt{toAST}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \label{sec:semantics}
 
-In this section, we specify the behavior of toAST() and compile()
+In this section, we specify the behavior of $toAST()$ and $compile()$
 by using the formalization of a subset of Lua semantics, presented
 in \cite{DeVito2013Terra} as Lua Core. We use the same formal framework
 of that work in order to properly compare and contrast our approach
@@ -441,8 +441,8 @@ present in Lua, and is therefore mostly sufficient for our purposes.
 We extend this specification with an arbitrary \emph{binary operator}
 expression, mimicking Lua operators supported by Lua2AST. This way,
 we have a recursive rule through which we can model Lua expressions
-as trees, to be later converted to ASTs. We also include toAST() and
-compile() as core language operations so we can specify their semantics
+as trees, to be later converted to ASTs. We also include $toAST()$ and
+$compile()$ as core language operations so we can specify their semantics
 separately from plain functions.
 
 \begin{figure}[t]
@@ -641,7 +641,7 @@ function, $\Sigma$ does not figure in the codomain of $\overset{D}{\rightarrow}$
 Note that $\overset{D}{\rightarrow}$ is defined only for base values
 (\textsc{DBase}), variables (\textsc{DVar}), the binary operator (\textsc{DOp}),
 and the initial function (\textsc{DFn}), mirroring the implementation
-of \emph{toAST}() in Lua2AST, which only supports functions containing
+of $toAST()$ in Lua2AST, which only supports functions containing
 these elements. Its rules deconstruct the body of the function and
 build the corresponding AST. Of particular interest is rule \textsc{DVar},
 which stores in the AST node a newly created closure, which returns
