@@ -357,10 +357,8 @@ end
 \end{verbatim}
 
 So, when we find an upvalue, we call \texttt{newclosure} function.
-Then its return is assigned to a variable and the found upvalue is joint to the \texttt{temp} upvalue.
-After pulling them together, we generate an unique identifier to the function returned by \texttt{newclosure}.
-We replace in the AST the node that identifies the free variable by an upvalue node.
-We insert the function with an unique identifier generated for the upvalue in this node.
+Then its return is assigned to a variable and the found upvalue is joined to the \texttt{temp} upvalue.
+After pulling them together, we replace in the AST the node that identifies the free variable by the function returned by \texttt{newclosure}.
 
 
 Figure \ref{fig:Lua2ASTExemple} illustrates the use of the toAST function.
@@ -371,7 +369,7 @@ The output of \texttt{last.print} will be as follows:
 %% Verificar higienizacao de variaveis
 \begin{verbatim}
 { `Function{ { `Id "x" },
-      { `Return{ `Op{ "add", `Id "x", `UpValue "clo_0"}}}}}}
+      { `Return{ `Op{ "add", `Id "x", `UpValue "y"}}}}}}
 \end{verbatim}
 
 
@@ -411,12 +409,18 @@ Using the AST above to examplify, its correspondent string would be as follows:
 
 %% TODO : higenizacao
 \begin{verbatim}
-"function(x) return x + closures["clo_0"]() end"
+[[ do 
+   local y=0 
+   return function(x) return x + y end 
+   end ]]
 \end{verbatim}
 
-This string is sent to the loadstring function.
-The function \texttt{compile} returns the result of \texttt{loadstring}.
+This string is sent to the \texttt{loadstring} function.
 This last one is a Lua standard function that returns a function in order to execute a string in a form of Lua code.
+Then, we use \texttt{debug.upvaluejoin} to bind the upvalues from the generated code with the upvalues of the closure stored in the AST.
+This mechanism ensures the code hygienization.
+After the bindings \texttt{compile} returns the function.
+
 In this way the user can use the returned function, that is the compilation of the AST.
 We can see the usage of the \texttt{compile} function in the line 14 of the figure \ref{fig:Lua2ASTExemple}.
 It uses the AST that was generated in line 5 by \texttt{toAST}.
