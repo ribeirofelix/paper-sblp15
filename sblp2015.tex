@@ -161,7 +161,7 @@ This feature, however, does not preserve scoping rules.
 Multi-Stage Programming \cite{Taha1999MSP,Taha2004gentle,Taha2008gentle} is
 similar to the quasi-quotation mechanism,
 but it takes lexical scoping into account.
-it features three constructs that programmers can use to
+It features three constructs that programmers can use to
 annotate code: \emph{brackets}, \emph{escape}, and \emph{run}.
 We will use MetaOCaml \cite{Calcagno2003implementing}, an OCaml extension
 with MSP support through these three staging constructs, to briefly explain
@@ -260,7 +260,7 @@ Expression lambdas can access external local variables, and they respect
 lexical scope, regardless if they are used to declare anonymous functions or
 only to produce an expression tree. Figure
 \ref{fig:ExpressionTrees} illustrates how lexical scoping is preserved in
-expression trees. Free variable \texttt{y} in line 5 references declaration
+expression trees. Free variable \texttt{y} in line 5 references the declaration
 from line 4, even when the expression tree returned in line 11 is compiled
 into a function in line 12.
 
@@ -288,7 +288,7 @@ meta-programming, a mechanism that allows programmers to interact
 with the compiler through a macro system \cite{Fleutot2007contrasting}.
 Metalua extends Lua 5.1 to provide methods for transforming Lua
 code into Abstract Syntax Trees, but this code cannot contain
-references to local variables of declared in an outer scope.
+references to local variables of an outer scope.
 
 Our implementation generates program ASTs in the same format as
 Metalua, but including information about enclosing local variables. While Metalua
@@ -303,7 +303,7 @@ operates only on restricted functions, but requires no quoting.
 Lua2AST is a Lua module that takes a restricted form of Lua function, that we named lambda functions, and generates its AST in runtime.
 Lambda functions are defined here as functions that only contain the return statement.
 The expression contained in the return statement can be of any kind and can also use variables of the outer lexical scope.
-In Lua, a function variable of outer lexical scope is called upvalue\cite{Ierusalimschy2006PIL} due to historical roots.
+In Lua, a function variable of outer lexical scope is called \emph{upvalue}\cite{Ierusalimschy2006PIL} due to historical reasons.
 % TODO: explain upvalues, \cite{Ierusalimschy2006PIL}
 
 Lua2AST uses external libraries: luadec and lua-parser.
@@ -316,7 +316,7 @@ Instead, the library takes a runtime binary chunk and uses the decompiler to get
 
 
 Lua is a dynamic language and has powerfull features like \texttt{dostring} function, that executes a given string as a Lua chunk.
-For example, we can use a user string input in a form of Lua syntax and use \texttt{dostring} in order to execute this input inside a running program.
+For example, we can use a user string input in a form of Lua code and use \texttt{dostring} in order to execute this input inside a running program.
 Since our method is done at runtime, with no syntax modification then preprocessors are not required, so functions as \texttt{dostring} may still be used.
 
 
@@ -327,12 +327,12 @@ The first one generates an AST and the second one compiles an AST.
 \subsection{Function toAST(func) }
 
 
-\texttt{toAST} generates an AST from a Lua function.
+The function \texttt{toAST} generates an AST from a Lua function.
 The parameter \texttt{func} must be a lambda function.
 The function's return is a Lua table that represents an AST.
 If the received function uses upvalues the returned table will be an annotated AST, so that the upvalues can be evaluated properly.
 
-The \texttt{toAST(func)} function calls the function \texttt{luadec(arg)} that belongs to \texttt{libluadec}, sending the function that will be transformed in AST as argument.
+The function \texttt{toAST(func)} calls the function \texttt{luadec(arg)} that belongs to \texttt{libluadec}, sending the function that will be transformed in AST as argument.
 The return of the \texttt{luadec(arg)} is a string that represents the passed function code.
 This string is sent to the parse function of \texttt{lua-parser} library and it returns the AST that represents the code.
 
@@ -365,7 +365,7 @@ We insert the function with an unique identifier generated for the upvalue in th
 
 Figure \ref{fig:Lua2ASTExemple} illustrates the use of the toAST function.
 The Lua code on this example does the same as the code on example of Figure \ref{fig:ExpressionTrees}.
-In adition, the command \texttt{last.print} dumps the AST in textual format, following the syntax defined by Metalua in \cite{metalua}.
+In addition, the command \texttt{last.print} dumps the AST in textual format, following the syntax defined by Metalua \cite{metalua}.
 It represents node types with uppercase names such as `Function; node data is represented as strings such as "x".
 The output of \texttt{last.print} will be as follows:
 %% Verificar higienizacao de variaveis
@@ -439,7 +439,7 @@ for multi-stage programming to that employed by Terra.
 
 Lua Core depicts the notions of lexical scoping, closures and side-effects
 present in Lua, and is therefore mostly sufficient for our purposes.
-We extend this specification with an arbitrary ``binary operator''
+We extend this specification with an arbitrary \emph{binary operator}
 expression, mimicking Lua operators supported by Lua2AST. This way,
 we have a recursive rule through which we can model Lua expressions
 as trees, to be later converted to ASTs. We also include toAST() and
