@@ -342,9 +342,9 @@ Firstly we find the parameters of the function and store them in a set.
 Later, we locate the free variables of the function.
 For each located variable we make a code lookup with the standard debug library.
 The lookup consists in finding a variable of outer lexical scope with the same name.
-When the variable is found, we do the AST annotation process.
+When the variable is found, we do the AST's decoration process.
 
-To do this annotation in our AST we use the function \texttt{upvaluejoin}, that also belongs to the debug library.
+To do this decoration in our AST we use the function \texttt{upvaluejoin}, that also belongs to the debug library.
 This function gets an upvalue from a Lua closure and make it refer to a desirable upvalue.
 So, in order to use this function, we need to create a Lua closure with an upvalue.
 To do so, we present the following function:
