@@ -414,14 +414,11 @@ Using the AST above to examplify, its correspondent string would be as follows:
 "function(x) return x + closures["clo_0"]() end"
 \end{verbatim}
 
-% Dica geral: pra deixar as explicações mais claras, evita a voz passiva.
-% Escrever na voz ativa te força a dizer _quem_ executa cada ação,
-% e é mais fácil pra quem lê acompanhar.
-
 This string is sent to the loadstring function.
-The function compile returns the result of loadstring.
-In this way the user can utilize the returned function that is the compilation of the AST.
-As we can see in the line 14 of the figure \ref{fig:Lua2ASTExemple} the usage of the \texttt{compile} function.
+The function \texttt{compile} returns the result of \texttt{loadstring}.
+This last one is a Lua standard function that returns a function in order to execute a string in a form of Lua code.
+In this way the user can use the returned function, that is the compilation of the AST.
+We can see the usage of the \texttt{compile} function in the line 14 of the figure \ref{fig:Lua2ASTExemple}.
 It uses the AST that was generated in line 5 by \texttt{toAST}.
 
 
