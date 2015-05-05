@@ -947,7 +947,11 @@ nt.
 \end_inset
 
  produced by the compilation is used as the namespace of the resulting function'
-s closure.
+s closure, as it contains references to every 
+\begin_inset Formula $x'$
+\end_inset
+
+ produced.
 \end_layout
 
 \begin_layout Standard

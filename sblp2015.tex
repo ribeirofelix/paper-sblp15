@@ -245,10 +245,10 @@ programatically, manipulating node objects via the API of the
  6        y = y + 1;
  7        return treesumY;
  8      }
- 9      void foo () {
+ 9      int foo () {
 10        int y = 10;
 11        Expression <sumY> ret = boo();
-12        int res = ret.Compile()(40); // res is 42
+12        return ret.Compile()(40); // returns 42
 13      }
 14    }
 \end{verbatim}
@@ -300,32 +300,50 @@ operates only on restricted functions, but requires no quoting.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \label{sec:lua2ast}
 
-Lua2AST is a Lua module that takes a restricted form of Lua function, that we named lambda functions, and generates its AST in runtime.
-Lambda functions are defined here as functions that only contain the return statement.
-The expression contained in the return statement can be of any kind and can also use variables of the outer lexical scope.
-In Lua, a function variable of outer lexical scope is called \emph{upvalue}\cite{Ierusalimschy2006PIL} due to historical reasons.
-% TODO: explain upvalues, \cite{Ierusalimschy2006PIL}
+Lua2AST is a Lua module that is able to generate ASTs given a restricted form of Lua functions, that we named lambda functions.
+Lambda functions are defined as functions that contain in its body a single \texttt{return} statement containing an expression.
+This expression can be of any kind and can also use variables of the outer lexical scope.
 
-Lua2AST uses external libraries: luadec and lua-parser.
-Lua-parser \cite{lua-parser} generates a Lua AST from a string with a valid Lua code.
-Luadec \cite{luadec} is a Lua decompiler that takes a Lua binary chunk and returns a string with equivalent code.
+Lua supports functions as a first-class value. Function objects are proper closures, and are internally implemented by
+storing along with each function a internal set of boxed references any \texttt{local} variables belonging to outer
+lexical scopes. In Lua, these references are called \emph{upvalues} \cite{Ierusalimschy2006PIL}.
+Upvalues implement proper lexical scoping and are generally transparent to the Lua programmer,
+but they can be directly manipulated through Lua's C API and through its debug API.
+Lua2AST can produce a Lua function object given an AST, and references to variables
+in the resulting function match the lexical scoping rules of the call site where the
+AST was originally generated. As we will see below, this is done using the debug API
+to correct upvalue references in the generated code.
 
-One big difference from this work to the related works is that our implementation is done via library and we do not use a preprocessor.
-Since a decompiler is used, there is no need to modify the Lua's virtual machine source code.
-Instead, the library takes a runtime binary chunk and uses the decompiler to get an equivalent code.
+Lua2AST uses two external Lua libraries in its implementation: LuaDec and Lua-Parser.
+Luadec \cite{luadec} is a Lua decompiler that takes a Lua binary chunk and returns a string with equivalent Lua source code.
+Lua-Parser \cite{lua-parser} generates a Lua table representing the code AST given a string of Lua source code.
+Lua2AST works by decompiling the input function with LuaDec, producing an AST with Lua-Parser
+and finally resolving upvalue references in this AST, producing an annotated AST
+with additional information that allows the library to recreate the function's original
+environment.
 
+Our approach to preserve variable references is to generate auxiliary closures
+when converting the function into AST format. These auxiliary closures are
+stored in the AST data structure. When compiling the AST back into a function,
+variable references are replaced by function calls to these closures.
 
-Lua is a dynamic language and has powerfull features like \texttt{dostring} function, that executes a given string as a Lua chunk.
-For example, we can use a user string input in a form of Lua code and use \texttt{dostring} in order to execute this input inside a running program.
-Since our method is done at runtime, with no syntax modification then preprocessors are not required, so functions as \texttt{dostring} may still be used.
+This approach presents two major advantages to usual methods for adding staged computation to existing languages.
+Firstly, our implementation is done entirely as a library. 
+By internally using a decompiler, we can operate directly on Lua function objects
+without having to use a source code preprocessor.
+This results in a non-intrusive approach: we did not need to create language extensions and we did not need to modify the Lua virtual machine.
 
+Secondly, our approach is particularly suitable for a dynamic language.
+If Lua2AST was implemented as a static pass over the input source code,
+it would not be possible to transform dynamically-loaded functions into ASTs.
+Since Lua2AST operates entirely at runtime, we are able to operate over
+any suitable lambda function, including dynamically-generated Lua functions,
+such as those loaded during program execution using the \texttt{dostring} function.
 
+Below, we will discuss the implementation in further detail, covering the two main functions
+of the Lua2AST API: \texttt{lua2ast.toAST} and \texttt{lua2ast.compile}.
 
-This module contains two principal functions: \texttt{toAST} and \texttt{compile}.
-The first one generates an AST and the second one compiles an AST.
-
-\subsection{Function toAST(func) }
-
+\subsection{Function lua2ast.toAST(\emph{func})}
 
 The function \texttt{toAST} generates an AST from a Lua function.
 The parameter \texttt{func} must be a lambda function.
@@ -375,27 +393,26 @@ The output of \texttt{last.print} will be as follows:
 
 \begin{figure}[t]
 \begin{verbatim}
- 1    local last = require "lua-to-AST"
+ 1    local lua2ast = require "lua2ast"
  2    
  3    function boo()
  4        local y = 1
- 5        local treesumY = last.toAST(function(x) return x + y end )
+ 5        local treesumY = lua2ast.toAST(function(x) return x + y end)
  6        y = y + 1
- 7        last.print(treesumY)
+ 7        lua2ast.print(treesumY)
  8        return treesumY
  9    end
 10    
 11    function foo()	
-12        y = 10
-13        ret = boo()
-14        f = last.compile(ast)
-15        print(f(40)) -- output: 42
-16    end
+12        local y = 10
+13        local ret = boo()
+14        return lua2ast.compile(ret)(40) -- returns 42
+15    end
 \end{verbatim}
-\protect\caption{\label{fig:Lua2ASTExemple}Lua2AST usage example}
+\protect\caption{\label{fig:Lua2ASTExample}Lua2AST usage example}
 \end{figure}
 
-\subsection{Function compile(ast) }
+\subsection{Function lua2ast.compile(\emph{ast})}
 
 % explicar que ele retorna uma NOVA função. do jeito que está escrito parece que ele faz lookup.
 This function returns a new function that is a result of the AST's compilation. 
@@ -422,7 +439,7 @@ This mechanism ensures the code hygienization.
 After the bindings \texttt{compile} returns the function.
 
 In this way the user can use the returned function, that is the compilation of the AST.
-We can see the usage of the \texttt{compile} function in the line 14 of the figure \ref{fig:Lua2ASTExemple}.
+We can see the usage of the \texttt{compile} function in the line 14 of the figure \ref{fig:Lua2ASTExample}.
 It uses the AST that was generated in line 5 by \texttt{toAST}.
 
 
