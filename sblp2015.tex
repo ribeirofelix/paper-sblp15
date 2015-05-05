@@ -493,7 +493,7 @@ as trees, to be later converted to ASTs. We also include toAST() and
 compile() as core language operations so we can specify their semantics
 separately from plain functions.
 
-\begin{figure}[t]
+\begin{figure}[t!]
 \begin{eqnarray*}
 e & = & b\,|\, x\,|\,\mbox{let \ensuremath{x=e}\ in\ \ensuremath{e}}\,|\, x\coloneqq e\,|\, e(e)\,|\,\mbox{fun}(x)\{e\}\,|\, e\mbox{ op }e\,|\,\mbox{toAST}(e)\,|\,\mbox{compile}(a)\\
 v & = & b\,|\,\left\langle \Gamma,x,e\right\rangle \,|\, a\\
@@ -522,7 +522,7 @@ which may contain nodes that wrap base values\emph{ }($[\mbox{base }b]$\emph{),
 As we will see below, the fact that variables are wrapped by a node
 containing a closure is central to our approach.
 
-\begin{figure}[t]
+\begin{figure}[t!]
 {\footnotesize{}}%
 \begin{minipage}[t]{0.59\columnwidth}%
 {\footnotesize{}
@@ -716,18 +716,24 @@ namespace from decompilation time ($\Gamma$ in \textsc{DVar}), so
 the variable references are bound to the addresses they have in the
 lexical scope where decompilation takes place. Any variable $x$ stored
 in an AST will only be evaluated when the compiled function returned
-by $compile(a)$ is called. By replacing variable references to function
+by $compile(a)$ is called.
+
+By replacing variable references to function
 calls to the wrapper closures, we ensure that the evaluation of variables
 (ultimately happening within the wrapper closures) are based on their
-original namespaces.
+original namespaces. This is different from the approach taken by
+Terra \cite{DeVito2013Terra}, where evaluation of Lua variables
+is done when the Terra code is generated. LINQ \cite{linq} preserves
+the lexical scoping of reconstructed function objects like our work does,
+but in our case staging happens entirely at run time.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusion}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \label{sec:conclusion}
 
-In this work we presented an approach for multi-stage programming through
-which the lexical scope of variables can be preserved, by replacing
+In this work we presented an approach for multi-stage programming, through
+which the lexical scope of variables can be preserved by replacing
 variable references in the generated representation of the embedded language
 with closures from the host language. When the intermediate representation
 is later converted into executable form, calls to these closures are
@@ -742,33 +748,30 @@ ensuring that the resulting function accesses the correct variables
 even if compiled at a different call site.
 
 The technique we present here is general, and its core principle
-is not dependent on decompilation or on specificities of Lua.
-It could be implemented in other languages using other methods,
-such as source code pre-processing. However, the dynamic manipulation
-of function objects, as opposed to compile-time manipulation of the
-source tree, allows us to perform multi-stage programming dynamically,
-operating on any suitable functions, even if they were created at run-time.
-This is particularly useful for dynamic languages which provide
-\texttt{eval}-like functionality, as is the case of Lua, with
-the \texttt{dostring()} function of its standard library.
+is not dependent on specificities of Lua. It could be implemented in other
+languages using other methods, such as source code pre-processing. However,
+the run-time manipulation of function objects made possible by decompilation,
+as opposed to compile-time manipulation of the source tree, allows us to
+perform multi-stage programming dynamically, operating on any suitable
+functions, even if they were created via dynamic code generation. This makes
+our approach particularly suitable for dynamic languages.
 
 Our implementation also exploited Lua's facilities for manipulating
-a closure's symbol table, which allowed the construction of the
+a closure's list of upvalues, which allowed the construction of the
 generated functions purely through manipulation of Lua function
 objects, without having to resort to low-level bytecode generation.
 The only bytecode-level manipulation performed by Lua2AST is
-read-only, and is restricted to the decompiler module. The
-implementation did not require any modifications to the Lua VM.
+read-only, and is restricted to the decompiler module. Our implementation
+required no language extensions and no modifications to the Lua VM.
 
 We also specified the operational semantics for the transformations
 performed by Lua2AST, in order to show how the lexical environment
-of variables is correctly preserved, and to properly contrast it with
+of variables is correctly preserved, and to contrast it with
 related work from the literature on multi-stage programming.
 
 This work presents many possibilities for future extensions. The current
 implementation is a proof-of-concept that demonstrates the technique,
-and can be extended to support a wider range of Lua functions, by
-supporting more of the host language's grammar. Another future work
+and can be extended to support more of the host language's grammar. Another future work
 we envision is the development of different code-generation back-ends,
 supporting other languages. This would allow, for example, using
 Lua functions for writing prepared statements for database query
