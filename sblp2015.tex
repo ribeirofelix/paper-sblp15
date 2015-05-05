@@ -388,7 +388,7 @@ from a different function.
 We take the upvalue from our desired variable and join it with the upvalue for the \texttt{temp} variable of our newly-created closure.
 We then store this auxiliary closure in the AST node that identifies the free variable.
 
-Figure \ref{fig:Lua2ASTExample} illustrates the use of the toAST function.
+Figure \ref{fig:Lua2ASTExample} illustrates the use of the \texttt{lua2ast.toAST()} function.
 The Lua code on this example operates equivalently to the code on Figure \ref{fig:ExpressionTrees}.
 For illustration purposes, the code also calls \texttt{lua2ast.print()}, which dumps the AST in textual format,
 following the syntax of Metalua. It represents node types with names such as \texttt{`Function}; node data is represented as strings such as \texttt{"x"}.
@@ -489,8 +489,8 @@ present in Lua, and is therefore mostly sufficient for our purposes.
 We extend this specification with an arbitrary ``binary operator''
 expression, mimicking Lua operators supported by Lua2AST. This way,
 we have a recursive rule through which we can model Lua expressions
-as trees, to be later converted to ASTs. We also include toAST() and
-compile() as core language operations so we can specify their semantics
+as trees, to be later converted to ASTs. We also include $toAST()$ and
+$compile()$ as core language operations so we can specify their semantics
 separately from plain functions.
 
 \begin{figure}[t!]
