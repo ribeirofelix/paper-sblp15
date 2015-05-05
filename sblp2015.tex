@@ -346,27 +346,33 @@ of the Lua2AST API: \texttt{lua2ast.toAST} and \texttt{lua2ast.compile}.
 \subsection{Function lua2ast.toAST(\emph{func})}
 
 The function \texttt{toAST} generates an AST from a Lua function.
-The parameter \texttt{func} must be a lambda function.
+It takes a Lua function as a parameter, which must be a lambda function.
 The function's return is a Lua table that represents an AST.
-If the received function uses upvalues the returned table will be a decorated AST, so that the upvalues can be evaluated properly.
+This table follows a standardized format for Lua ASTs that was originally defined by the Metalua project \cite{metalua}.
+If the received function uses upvalues, this AST will be decorated with additional data, so that upvalue references
+can be later reconstructed.
 
-The function \texttt{toAST} calls the function \texttt{luadec} that belongs to \texttt{libluadec}.
-\texttt{toAST} sends the received function to \texttt{luadec}. 
-The return of the \texttt{luadec} is a string that represents the passed function code.
-This string is sent to the parse function of \texttt{lua-parser} library and it returns the AST that represents the code.
+The function \texttt{toAST} initially calls the LuaDec decompiler to produce a source code representation of the given function.
+This string is sent to the \texttt{parse} function of the Lua-Parser library, producing the AST that represents the code.
+The AST as returned by Lua-Parser, however, would not be sufficient to reconstruct the function with proper scoping rules.
+Simply rebuilding the plain AST into source code and loading into Lua would produce a function where all local variables
+of outer scopes would turn into global variable references, since in Lua undeclared variables are treated as globals
+by default.
 
-\texttt{toAST} traverses the received AST once.
-Firstly we find the parameters of the function and store them in a set.
-Later, we locate the free variables of the function.
-For each located variable we make a code lookup with the standard debug library.
-The lookup consists in finding a variable of outer lexical scope with the same name.
-When the variable is found, we do the AST's decoration process.
+The next step, therefore, is to detect locals of outer scopes and to annotate them in the AST. 
+This is done by scanning variable references in the AST and matching them to the list of upvalues
+of the function object.
+Firstly, we find the parameters of the function and store them in a set.
+Then, we locate the free variables of the function, which are indentifiers in our expression tree that are not in the set of function arguments.
+These free identifiers may be references to outer locals or references to global variables.
+Any outer local will have a matching entry in the internal list of upvalues of the closure.
+We look for this entry using \texttt{debug.getupvalue()}, a function of Lua's standard library
+that allows us to perform introspection of a function's upvalues.
+When the variable is found, we decorate the AST node.
 
-To do this decoration in our AST we use the function \texttt{upvaluejoin}, that also belongs to the debug library.
-This function gets an upvalue from a Lua closure and make it refer to a desirable upvalue.
-So, in order to use this function, we need to create a Lua closure with an upvalue.
-To do so, we present the following function:
-
+To do this decoration in our AST, we create a closure which will hold a reference
+to our desired variable.
+To do so, we use the following helper function:
 
 \begin{verbatim}
 local function newclosure()
@@ -375,22 +381,25 @@ local function newclosure()
 end
 \end{verbatim}
 
-So, when we find an upvalue, we call \texttt{newclosure} function.
-Then its return is assigned to a variable and the found upvalue is joined to the \texttt{temp} upvalue.
-After pulling them together, we replace in the AST the node that identifies the free variable by the function returned by \texttt{newclosure}.
-
+This function produces a new closure that contains an upvalue and merely returns it.
+We then use the function \texttt{debug.upvaluejoin()}, also from the standard library.
+This function gets an upvalue from a Lua closure and make it refer to another upvalue
+from a different function. 
+We take the upvalue from our desired variable and join it with the upvalue for the \texttt{temp} variable of our newly-created closure.
+We then store this auxiliary closure in the AST node that identifies the free variable.
 
 Figure \ref{fig:Lua2ASTExemple} illustrates the use of the toAST function.
-The Lua code on this example does the same as the code on example of Figure \ref{fig:ExpressionTrees}.
-In addition, the command \texttt{last.print} dumps the AST in textual format, following the syntax defined by Metalua \cite{metalua}.
-It represents node types with uppercase names such as `Function; node data is represented as strings such as "x".
-The output of \texttt{last.print} will be as follows:
-%% Verificar higienizacao de variaveis
+The Lua code on this example operates equivalently to the code on Figure \ref{fig:ExpressionTrees}.
+For illustration purposes, the code also calls \texttt{lua2ast.print()}, which dumps the AST in textual format,
+following the syntax of Metalua. It represents node types with names such as \texttt{`Function}; node data is represented as strings such as \texttt{"x"}.
+The output produced by the call at line 7 would be as follows:
+
 \begin{verbatim}
 { `Function{ { `Id "x" },
-      { `Return{ `Op{ "add", `Id "x", `UpValue "y"}}}}}}
+      { `Return{ `Op{ "add", `Id "x", `Id "y"}}}}}}
 \end{verbatim}
 
+Node \texttt{`Id "y"} is internally decorated with a closure that returns the value of \texttt{y} defined in line 4.
 
 \begin{figure}[t]
 \begin{verbatim}
