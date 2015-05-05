@@ -348,10 +348,11 @@ of the Lua2AST API: \texttt{lua2ast.toAST} and \texttt{lua2ast.compile}.
 The function \texttt{toAST} generates an AST from a Lua function.
 The parameter \texttt{func} must be a lambda function.
 The function's return is a Lua table that represents an AST.
-If the received function uses upvalues the returned table will be an annotated AST, so that the upvalues can be evaluated properly.
+If the received function uses upvalues the returned table will be a decorated AST, so that the upvalues can be evaluated properly.
 
-The function \texttt{toAST(func)} calls the function \texttt{luadec(arg)} that belongs to \texttt{libluadec}, sending the function that will be transformed in AST as argument.
-The return of the \texttt{luadec(arg)} is a string that represents the passed function code.
+The function \texttt{toAST} calls the function \texttt{luadec} that belongs to \texttt{libluadec}.
+\texttt{toAST} sends the received function to \texttt{luadec}. 
+The return of the \texttt{luadec} is a string that represents the passed function code.
 This string is sent to the parse function of \texttt{lua-parser} library and it returns the AST that represents the code.
 
 \texttt{toAST} traverses the received AST once.
@@ -359,9 +360,9 @@ Firstly we find the parameters of the function and store them in a set.
 Later, we locate the free variables of the function.
 For each located variable we make a code lookup with the standard debug library.
 The lookup consists in finding a variable of outer lexical scope with the same name.
-When the variable is found, we do the AST annotation process.
+When the variable is found, we do the AST's decoration process.
 
-To do this annotation in our AST we use the function \texttt{upvaluejoin}, that also belongs to the debug library.
+To do this decoration in our AST we use the function \texttt{upvaluejoin}, that also belongs to the debug library.
 This function gets an upvalue from a Lua closure and make it refer to a desirable upvalue.
 So, in order to use this function, we need to create a Lua closure with an upvalue.
 To do so, we present the following function:
