@@ -477,26 +477,27 @@ original function declared in line 5.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \label{sec:semantics}
 
-In this section, we specify the behavior of $toAST()$ and $compile()$
-by using the formalization of a subset of Lua semantics, presented
-in \cite{DeVito2013Terra} as Lua Core. We use the same formal framework
-of that work in order to properly compare and contrast our approach
-for multi-stage programming to that employed by Terra.
+In this section, we specify the behavior of \texttt{lua2ast.toAST()}
+and \texttt{lua2ast.compile()} by using the formalization of a subset
+of Lua semantics, presented in \cite{DeVito2013Terra} as Lua Core.
+We use the same formal framework of that work in order to properly
+compare and contrast our approach for multi-stage programming to that
+employed by Terra.
 
 Lua Core depicts the notions of lexical scoping, closures and side-effects
 present in Lua, and is therefore mostly sufficient for our purposes.
-We extend this specification with an arbitrary \emph{binary operator}
+We extend this specification with an arbitrary ``binary operator''
 expression, mimicking Lua operators supported by Lua2AST. This way,
 we have a recursive rule through which we can model Lua expressions
-as trees, to be later converted to ASTs. We also include $toAST()$ and
-$compile()$ as core language operations so we can specify their semantics
+as trees, to be later converted to ASTs. We also include toAST() and
+compile() as core language operations so we can specify their semantics
 separately from plain functions.
 
 \begin{figure}[t]
 \begin{eqnarray*}
-e & = & b\,|\, x\,|\,\mbox{let \ensuremath{x=e}\,\ in\,\ensuremath{e}}\,|\, x\coloneqq e\,|\, e(e)\,|\,\mbox{fun}(x)\{e\}\,|\, e\mbox{ op }e\,|\,\mbox{toAST}(e)\,|\,\mbox{compile}(a)\\
+e & = & b\,|\, x\,|\,\mbox{let \ensuremath{x=e}\ in\ \ensuremath{e}}\,|\, x\coloneqq e\,|\, e(e)\,|\,\mbox{fun}(x)\{e\}\,|\, e\mbox{ op }e\,|\,\mbox{toAST}(e)\,|\,\mbox{compile}(a)\\
 v & = & b\,|\,\left\langle \Gamma,x,e\right\rangle \,|\, a\\
-a & = & [\mbox{fn\,\ensuremath{x}\,\ensuremath{a}}]\,|\,[\mbox{base \ensuremath{b}}]\,|\,[\mbox{var}\,\left\langle \Gamma,x,e\right\rangle ]\,|\,[\mbox{op\,\ensuremath{a}\,\ensuremath{a}}]
+a & = & [\mbox{fn\ \ensuremath{x}\ \ensuremath{a}}]\,|\,[\mbox{base\ \ensuremath{b}}]\,|\,[\mbox{var}\ x\ \left\langle \Gamma,x,e\right\rangle ]\,|\,[\mbox{op\ \ensuremath{a}\ \ensuremath{a}}]
 \end{eqnarray*}
 \protect\caption{\label{fig:LuaCoreSyntax}Syntax of our version of Lua Core, extended
 with constructs to specify Lua2AST}
@@ -506,7 +507,7 @@ with constructs to specify Lua2AST}
 The syntax of our version of Lua Core is presented in Figure \ref{fig:LuaCoreSyntax}.
 A Lua expression ($e$) can be either a base value ($b$), a variable
 ($x$), a scoped variable definition ($\mbox{let \ensuremath{x=e}\ in\ \ensuremath{e}}$,
-with $e_{1};e_{2}$ as sugar for $\mbox{let \ensuremath{\_=e_{1}} in \ensuremath{e_{2}}}$),
+with $e_{1};e_{2}$ as sugar for $\mbox{let \ensuremath{\_=e_{1}}in \ensuremath{e_{2}}}$),
 a variable assignment ($x\coloneqq e$), an application ($e(e)$),
 a function definition ($\mbox{fun}(x)\{e\}$), an operation on expressions
 ($e\mbox{ op }e$), or one of the special invocations \emph{toAST($e$)}
@@ -515,13 +516,13 @@ Lua ASTs ($a$) or closures. A closure is represented as a triple
 $\left\langle \Gamma,x,e\right\rangle $, consisting of a namespace
 $\Gamma:x\rightarrow p$ (mapping variable names $x$ to memory positions
 $p$), an input argument $x$ and an expression body $e$. A Lua AST
-for a function consists of a root node ($[\mbox{fn\,\ensuremath{x}\,\ensuremath{a}}]$)
+for a function consists of a root node ($[\mbox{fn\ \ensuremath{x}\ \ensuremath{a}}]$)
 which may contain nodes that wrap base values\emph{ }($[\mbox{base }b]$\emph{),
-}operations ($[\mbox{op}\, a\, a]$), and variables ($[\mbox{var }\left\langle \Gamma,x,e\right\rangle ]$).
+}operations ($[\mbox{op}\ a\ a]$), and variables ($[\mbox{var}\ x\ \left\langle \Gamma,x,e\right\rangle ]$).
 As we will see below, the fact that variables are wrapped by a node
 containing a closure is central to our approach.
 
-\begin{figure}[t!]
+\begin{figure}[t]
 {\footnotesize{}}%
 \begin{minipage}[t]{0.59\columnwidth}%
 {\footnotesize{}
@@ -598,7 +599,7 @@ b,\Sigma\overset{D}{\rightarrow}[\mbox{base }b]\textsc{ (DBase)}
 {\footnotesize{}
 \[
 \frac{\begin{array}[t]{c}
-\Sigma=(\Gamma,S)\end{array}}{x,\Sigma\overset{D}{\rightarrow}[\mbox{var }\left\langle \Gamma,\_,x\right\rangle ]}\textsc{ (DVar)}
+\Sigma=(\Gamma,S)\end{array}}{x,\Sigma\overset{D}{\rightarrow}[\mbox{var}\ x\ \left\langle \Gamma,\_,x\right\rangle ]}\textsc{ (DVar)}
 \]
 }{\footnotesize \par}
 
@@ -624,9 +625,9 @@ b,\Sigma\overset{D}{\rightarrow}[\mbox{base }b]\textsc{ (DBase)}
 \[
 \frac{\begin{array}[t]{c}
 \Sigma_{1}=(\Gamma,S)\\
-p\,\mbox{fresh}\,\,\,\,\, x'\,\mbox{fresh}\\
-\Sigma_{2}=(\Gamma[x'\leftarrow p],S[p\leftarrow f])
-\end{array}}{[\mbox{var }f],\Sigma_{1}\overset{C}{\rightarrow}x'(\_),\Sigma_{2}}\textsc{ (CVar)}
+p\,\mbox{fresh}\\
+\Sigma_{2}=(\Gamma[x\leftarrow p],S[p\leftarrow f])
+\end{array}}{[\mbox{var}\ x\ f],\Sigma_{1}\overset{C}{\rightarrow}x(\_),\Sigma_{2}}\textsc{ (CVar)}
 \]
 }{\footnotesize \par}
 
@@ -661,9 +662,7 @@ that maps memory positions to values%
 environment $\Sigma=(\Gamma,S,F)$ where $F$ is specific to Terra
 functions. In our presentation, we removed $F$. Rules reused from
 \cite{DeVito2013Terra} were adapted accordingly.%
-}.
-
-We use $\overset{L}{\rightarrow}:(e\times\Sigma)\rightarrow(v\times\Sigma)$
+}. We use $\overset{L}{\rightarrow}:(e\times\Sigma)\rightarrow(v\times\Sigma)$
 for the evaluation of Lua expressions as in \cite{DeVito2013Terra}.
 Rules for $\overset{L}{\rightarrow}$ presented here are equivalent
 to those in that work: \textsc{LVal} and \textsc{LVar} evaluate values
@@ -688,7 +687,7 @@ function, $\Sigma$ does not figure in the codomain of $\overset{D}{\rightarrow}$
 Note that $\overset{D}{\rightarrow}$ is defined only for base values
 (\textsc{DBase}), variables (\textsc{DVar}), the binary operator (\textsc{DOp}),
 and the initial function (\textsc{DFn}), mirroring the implementation
-of $toAST()$ in Lua2AST, which only supports functions containing
+of \emph{toAST}() in Lua2AST, which only supports functions containing
 these elements. Its rules deconstruct the body of the function and
 build the corresponding AST. Of particular interest is rule \textsc{DVar},
 which stores in the AST node a newly created closure, which returns
@@ -700,12 +699,14 @@ each of the four decompilation rules there is a complementary compilation
 rule: \textsc{CBase}, \textsc{CVar}, \textsc{COp} and \textsc{CFn}.
 Rule \textsc{CVar} translates nodes representing variable references
 into a function call to the closure created by rule \textsc{DVar}.
-\textsc{CVar} assigns this closure to a new variable $x'$, guaranteed
-to be an unused symbol, to maintain hygiene. Rule \textsc{CFn} returns
-a closure representing the entire compiled function and a new environment.
-This environment contains an unmodified namespace $\Gamma_{1}$ and
-a new store $S_{2}$, which includes any closures created for keeping
-variable references.
+\textsc{CVar} assigns this closure to a variable $x$ in the resulting
+environment, and produces a function call to this closure instead
+of a variable reference. Rule \textsc{CFn} returns a closure representing
+the entire compiled function and a new environment. This environment
+contains an unmodified namespace $\Gamma_{1}$ and a new store $S_{2}$,
+which includes any closures created for keeping variable references.
+The extended namespace $\Gamma_{2}$ produced by the compilation is
+used as the namespace of the resulting function's closure.
 
 As a result of running $compile()$, all variable references that
 existed in the original function that was decompiled and was now recompiled
@@ -715,9 +716,10 @@ namespace from decompilation time ($\Gamma$ in \textsc{DVar}), so
 the variable references are bound to the addresses they have in the
 lexical scope where decompilation takes place. Any variable $x$ stored
 in an AST will only be evaluated when the compiled function returned
-by $compile(a)$ is called, and the call to wrapper closure $x'()$
-(produced by \textsc{CVar}) will ensure that $x$ is tied to its original
-namespace.
+by $compile(a)$ is called. By replacing variable references to function
+calls to the wrapper closures, we ensure that the evaluation of variables
+(ultimately happening within the wrapper closures) are based on their
+original namespaces.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusion}

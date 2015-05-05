@@ -69,8 +69,15 @@
 \begin_body
 
 \begin_layout Standard
-In this section, we specify the behavior of toAST() and compile() by using
- the formalization of a subset of Lua semantics, presented in 
+In this section, we specify the behavior of 
+\family typewriter
+lua2ast.toAST()
+\family default
+ and 
+\family typewriter
+lua2ast.compile()
+\family default
+ by using the formalization of a subset of Lua semantics, presented in 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "DeVito2013Terra"
@@ -111,9 +118,9 @@ status open
 \begin_layout Plain Layout
 \begin_inset Formula 
 \begin{eqnarray*}
-e & = & b\,|\, x\,|\,\mbox{let \ensuremath{x=e}\,\ in\,\ensuremath{e}}\,|\, x\coloneqq e\,|\, e(e)\,|\,\mbox{fun}(x)\{e\}\,|\, e\mbox{ op }e\,|\,\mbox{toAST}(e)\,|\,\mbox{compile}(a)\\
+e & = & b\,|\, x\,|\,\mbox{let \ensuremath{x=e}\ in\ \ensuremath{e}}\,|\, x\coloneqq e\,|\, e(e)\,|\,\mbox{fun}(x)\{e\}\,|\, e\mbox{ op }e\,|\,\mbox{toAST}(e)\,|\,\mbox{compile}(a)\\
 v & = & b\,|\,\left\langle \Gamma,x,e\right\rangle \,|\, a\\
-a & = & [\mbox{fn\,\ensuremath{x}\,\ensuremath{a}}]\,|\,[\mbox{base \ensuremath{b}}]\,|\,[\mbox{var}\,\left\langle \Gamma,x,e\right\rangle ]\,|\,[\mbox{op\,\ensuremath{a}\,\ensuremath{a}}]
+a & = & [\mbox{fn\ \ensuremath{x}\ \ensuremath{a}}]\,|\,[\mbox{base\ \ensuremath{b}}]\,|\,[\mbox{var}\ x\ \left\langle \Gamma,x,e\right\rangle ]\,|\,[\mbox{op\ \ensuremath{a}\ \ensuremath{a}}]
 \end{eqnarray*}
 
 \end_inset
@@ -310,7 +317,7 @@ compile(
 
 .
  A Lua AST for a function consists of a root node (
-\begin_inset Formula $[\mbox{fn\,\ensuremath{x}\,\ensuremath{a}}]$
+\begin_inset Formula $[\mbox{fn\ \ensuremath{x}\ \ensuremath{a}}]$
 \end_inset
 
 ) which may contain nodes that wrap base values
@@ -326,11 +333,11 @@ compile(
 ), 
 \emph default
 operations (
-\begin_inset Formula $[\mbox{op}\, a\, a]$
+\begin_inset Formula $[\mbox{op}\ a\ a]$
 \end_inset
 
 ), and variables (
-\begin_inset Formula $[\mbox{var }\left\langle \Gamma,x,e\right\rangle ]$
+\begin_inset Formula $[\mbox{var}\ x\ \left\langle \Gamma,x,e\right\rangle ]$
 \end_inset
 
 ).
@@ -523,7 +530,7 @@ b,\Sigma\overset{D}{\rightarrow}[\mbox{base }b]\textsc{ (DBase)}
 \begin_inset Formula 
 \[
 \frac{\begin{array}[t]{c}
-\Sigma=(\Gamma,S)\end{array}}{x,\Sigma\overset{D}{\rightarrow}[\mbox{var }\left\langle \Gamma,\_,x\right\rangle ]}\textsc{ (DVar)}
+\Sigma=(\Gamma,S)\end{array}}{x,\Sigma\overset{D}{\rightarrow}[\mbox{var}\ x\ \left\langle \Gamma,\_,x\right\rangle ]}\textsc{ (DVar)}
 \]
 
 \end_inset
@@ -577,9 +584,9 @@ b,\Sigma\overset{D}{\rightarrow}[\mbox{base }b]\textsc{ (DBase)}
 \[
 \frac{\begin{array}[t]{c}
 \Sigma_{1}=(\Gamma,S)\\
-p\,\mbox{fresh}\,\,\,\,\, x'\,\mbox{fresh}\\
-\Sigma_{2}=(\Gamma[x'\leftarrow p],S[p\leftarrow f])
-\end{array}}{[\mbox{var }f],\Sigma_{1}\overset{C}{\rightarrow}x'(\_),\Sigma_{2}}\textsc{ (CVar)}
+p\,\mbox{fresh}\\
+\Sigma_{2}=(\Gamma[x\leftarrow p],S[p\leftarrow f])
+\end{array}}{[\mbox{var}\ x\ f],\Sigma_{1}\overset{C}{\rightarrow}x(\_),\Sigma_{2}}\textsc{ (CVar)}
 \]
 
 \end_inset
@@ -922,11 +929,12 @@ DVar
 \shape smallcaps
 CVar
 \shape default
- assigns this closure to a new variable 
-\begin_inset Formula $x'$
+ assigns this closure to a variable 
+\begin_inset Formula $x$
 \end_inset
 
-, guaranteed to be an unused symbol, to maintain hygiene.
+ in the resulting environment, and produces a function call to this closure
+ instead of a variable reference.
  Rule 
 \shape smallcaps
 CFn
@@ -947,11 +955,7 @@ nt.
 \end_inset
 
  produced by the compilation is used as the namespace of the resulting function'
-s closure, as it contains references to every 
-\begin_inset Formula $x'$
-\end_inset
-
- produced.
+s closure.
 \end_layout
 
 \begin_layout Standard
@@ -981,19 +985,10 @@ DVar
 \begin_inset Formula $compile(a)$
 \end_inset
 
- is called, and the call to wrapper closure 
-\begin_inset Formula $x'()$
-\end_inset
-
- (produced by 
-\shape smallcaps
-CVar
-\shape default
-) will ensure that 
-\begin_inset Formula $x$
-\end_inset
-
- is tied to its original namespace.
+ is called.
+ By replacing variable references to function calls to the wrapper closures,
+ we ensure that the evaluation of variables (ultimately happening within
+ the wrapper closures) are based on their original namespaces.
 \end_layout
 
 \begin_layout Bibliography
