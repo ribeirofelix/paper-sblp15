@@ -57,6 +57,8 @@ Multi-Stage Programming
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \label{sec:introduction}
 
+%% TODO: o que queremos dizer por "dynamiclly"
+
 Domain-Specific Languages (DSLs) are a way to simplify the development
 of programs through the aggregation of domain knowledge into a
 programming language.
@@ -109,7 +111,7 @@ Using MSP to embed languages inside imperative languages can be hard,
 because in these languages programmers can move code objects so they
 are used outside of the scope of the binder of their free variables
 \cite{Westbrook2010Mint}.
-In purely functional languages we do not have this problem 
+In purely functional languages we do not have this problem
 due to the absence of side effects \cite{Kameyama2008CSS}.
 
 In this work, we propose an approach for meta-programming
@@ -175,7 +177,7 @@ constructing an object instead that represents the marked block of code:
 \end{verbatim}
 
 In the above example, \texttt{x} has type \texttt{int} and \texttt{y} has
-type \texttt{int code}. 
+type \texttt{int code}.
 This means that the expression \texttt{x + y} is invalid code in MetaOCaml,
 as the types of both variables do not match. \emph{Escapes}, marked as \texttt{.\~}, combine small delayed computations for building
 bigger ones:
@@ -233,7 +235,7 @@ corresponding to that expression, called an \emph{expression tree}
 more general term that can refer to both single-expression anonymous functions
 called \emph{expression lambdas} and multi-statement functions called
 \emph{statement lambdas}. Conversion to expression trees is only supported for
-expression lambdas.}. Expression trees can also be created 
+expression lambdas.}. Expression trees can also be created
 programatically, manipulating node objects via the API of the
 \texttt{Expression} class.
 
@@ -302,6 +304,10 @@ operates only on restricted functions, but requires no quoting.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \label{sec:lua2ast}
 
+%% TODO : melhorar a intro desta seção, deixando CLARO que aqui comeca nossa contribuição
+
+%% TODO: Quais features necessarias numa linguagem para implementar nossa solução?(aqui ou na conclusão)
+
 Lua2AST is a Lua module that is able to generate ASTs given a restricted form of Lua functions, that we named lambda functions.
 Lambda functions are defined as functions that contain in its body a single \texttt{return} statement containing an expression.
 This expression can be of any kind and can also use variables of the outer lexical scope.
@@ -330,7 +336,7 @@ stored in the AST data structure. When compiling the AST back into a function,
 variable references are replaced by function calls to these closures.
 
 This approach presents two major advantages to usual methods for adding staged computation to existing languages.
-Firstly, our implementation is done entirely as a library. 
+Firstly, our implementation is done entirely as a library.
 By internally using a decompiler, we can operate directly on Lua function objects
 without having to use a source code preprocessor.
 This results in a non-intrusive approach: we did not need to create language extensions and we did not need to modify the Lua virtual machine.
@@ -361,7 +367,7 @@ Simply rebuilding the plain AST into source code and loading into Lua would prod
 of outer scopes would turn into global variable references, since in Lua undeclared variables are treated as globals
 by default.
 
-The next step, therefore, is to detect locals of outer scopes and to annotate them in the AST. 
+The next step, therefore, is to detect locals of outer scopes and to annotate them in the AST.
 This is done by scanning variable references in the AST and matching them to the list of upvalues
 of the function object.
 Firstly, we find the parameters of the function and store them in a set.
@@ -386,7 +392,7 @@ end
 This function produces a new closure that contains an upvalue and merely returns it.
 We then use the function \texttt{debug.upvaluejoin()}, also from the standard library.
 This function gets an upvalue from a Lua closure and make it refer to another upvalue
-from a different function. 
+from a different function.
 We take the upvalue from our desired variable and join it with the upvalue for the \texttt{temp} variable of our newly-created closure.
 We then store this auxiliary closure in the AST node that identifies the free variable.
 
@@ -407,7 +413,7 @@ Node \texttt{`Id "y"} is internally decorated with a closure that returns the va
 \begin{figure}[t]
 \begin{verbatim}
  1    local lua2ast = require "lua2ast"
- 2    
+ 2
  3    function boo()
  4        local y = 1
  5        local treesumY = lua2ast.toAST(function(x) return x + y end)
@@ -415,8 +421,8 @@ Node \texttt{`Id "y"} is internally decorated with a closure that returns the va
  7        lua2ast.print(treesumY)
  8        return treesumY
  9    end
-10    
-11    function foo()	
+10
+11    function foo()
 12        local y = 10
 13        local ret = boo()
 14        return lua2ast.compile(ret)(40) -- returns 42
@@ -436,7 +442,7 @@ compiling it and then using the standard debug library's
 facilities to attach the auxiliary closures to the generated function's
 upvalue slots.
 
-Proceeding with the example of Figure \ref{fig:Lua2ASTExample}, 
+Proceeding with the example of Figure \ref{fig:Lua2ASTExample},
 the AST returned in line 13 would be initially converted into the
 following source code (Lua uses double-brackets for multi-line strings):
 
@@ -463,9 +469,11 @@ references to make them point to the auxiliary closures created by
 For that, we use the standard function \texttt{debug.setupvalue()},
 which takes a closure, an upvalue index and a Lua value, and sets
 the variable pointed by the upvalue to the given value.
+%% TODO
 It is worth pointing out, however, that by setting this value we are not fixing the value
 of the original variable reference, since we replaced it in the newly generated function
 with a call to a proxy function, which is being fixed in its stead.
+%% END TODO
 We formalize this process in the following section.
 
 Once the upvalues are fixed, \texttt{lua2ast.compile()} returns the
