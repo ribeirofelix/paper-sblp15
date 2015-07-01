@@ -480,12 +480,13 @@ references to make them point to the auxiliary closures created by
 For that, we use the standard function \texttt{debug.setupvalue()},
 which takes a closure, an upvalue index and a Lua value, and sets
 the variable pointed by the upvalue to the given value.
-%% TODO
 It is worth pointing out, however, that by setting this value we are not fixing the value
-of the original variable reference, since we replaced it in the newly generated function
-with a call to a proxy function, which is being fixed in its stead.
-%% END TODO
-We formalize this process in the following section.
+of the original variable reference (\texttt{y} from line 5 in Figure \ref{fig:Lua2ASTExample}).
+This reference was replaced in the newly generated function
+with a call to a proxy function (\texttt{y()} in the above example),
+and it is this new \texttt{local y} variable which is having its value fixed
+with the correct proxy function instead.
+We formalize this process precisely in the following section.
 
 Once the upvalues are fixed, \texttt{lua2ast.compile()} returns the
 function. In line 14 of Figure \ref{fig:Lua2ASTExample} we see
