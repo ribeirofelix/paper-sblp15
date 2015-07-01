@@ -56,8 +56,6 @@ Multi-Stage Programming
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \label{sec:introduction}
 
-%% TODO: o que queremos dizer por "dynamiclly"
-
 Domain-Specific Languages (DSLs) are a way to simplify the development
 of programs through the aggregation of domain knowledge into a
 programming language.
@@ -113,6 +111,14 @@ are used outside of the scope of the binder of their free variables
 In purely functional languages we do not have this problem
 due to the absence of side effects \cite{Kameyama2008CSS}.
 
+Languages that support dynamically-generated code, such
+as those that provide \texttt{eval}-style functions where a string
+of source code can be compiled into a function object at runtime,
+present further challenges. Traditional static approaches to
+meta-programming that work by performing a pre-processing pass
+at compile time may not be suitable, as the relevant functions
+may not be generated yet.
+
 In this work, we propose an approach for meta-programming
 in which the embedded code shares variables with the
 host language, preserving lexical scoping rules even after the code is
@@ -129,6 +135,10 @@ and can later rebuild them preserving scoping rules of the decompilation site.
 For simplicity, our implementation only supports functions that contain
 a single expression.
 We call these functions \emph{lambda functions}.
+
+The technique we present here operates entirely at runtime,
+and is therefore suitable for languages that may be embedded using
+the dynamic features of the host language.
 
 Our method requires no special annotation of functions to be translated and is
 implemented as a library, requiring no source pre-processing or changes to
