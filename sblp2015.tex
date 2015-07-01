@@ -37,8 +37,7 @@ We propose an approach in which the embedded code shares variables with the
 host language, preserving lexical scoping rules even after the code is
 converted into an intermediate representation. We demonstrate this approach
 through a module for meta-programming using Lua as both embedded and host
-languages, which decompiles Lua functions to their AST form and can later
-rebuild them preserving scoping rules of the decompilation site. Our method
+languages. Our technique supports dynamically generated code,
 requires no special annotation of functions to be translated and is
 implemented as a library, requiring no source pre-processing or changes to
 the host language execution environment.
