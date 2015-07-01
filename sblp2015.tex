@@ -313,9 +313,11 @@ operates only on restricted functions, but requires no quoting.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \label{sec:lua2ast}
 
-%% TODO : melhorar a intro desta seção, deixando CLARO que aqui comeca nossa contribuição
-
 %% TODO: Quais features necessarias numa linguagem para implementar nossa solução?(aqui ou na conclusão)
+
+We now present our proposed approach for run-time meta-programming. We begin
+by describing in this section our implementation, Lua2AST. In the following
+section, we proceed by formally discussing its semantics.
 
 Lua2AST is a Lua module that is able to generate ASTs given a restricted form of Lua functions, that we named lambda functions.
 Lambda functions are defined as functions that contain in its body a single \texttt{return} statement containing an expression.
